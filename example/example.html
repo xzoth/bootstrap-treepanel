@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>bootstrap-treepanel example</title>
+    <link href="resources/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../src/css/bootstrap-treepanel.css" rel="stylesheet" />
+
+    <script src="resources/bootstrap/jquery-2.1.0.min.js"></script>
+    <script src="resources/bootstrap/bootstrap.min.js"></script>
+    <script src="../src/js/bootstrap-treepanel.js"></script>
+</head>
+<body>
+    <p>
+        <div class="container">
+            <div class="list-group">
+                <a class="list-group-item" href="#">
+                    <i class="node-icon glyphicon glyphicon-chevron-down"></i>
+                    Root
+                </a>
+                <span class="node-container">
+                    <a class="list-group-item" href="#">
+                        <span class="node-indent"></span>
+                        <i class="node-icon glyphicon glyphicon-chevron-down"></i>
+                        node
+                    </a>
+                    <span class="node-container">
+                        <a class="list-group-item">
+                            <span class="node-indent"></span>
+                            <span class="node-indent"></span>
+                            <i class="node-icon glyphicon"></i>
+                            node
+                        </a>
+                        <a class="list-group-item" href="#">
+                            <span class="node-indent"></span>
+                            <span class="node-indent"></span>
+                            <i class="node-icon glyphicon"></i>
+                            node
+                        </a>
+                    </span>
+                    <a class="list-group-item" href="#">
+                        <span class="node-indent"></span>
+                        <i class="node-icon glyphicon"></i>
+                        node
+                    </a>
+                </span>
+            </div>
+        </div>
+    </p>
+    <div class="container">
+        <div id="tree" class="list-group">
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            var options = {
+                hasBorder: true,
+                displayField: 'name',
+                childNodesField: 'nodes',
+                data: '[{ "number":230, "name":"Root", "nodes":[{ "number":231, "name":"node" }, {"number":232, "name":"node"}] }]'
+            };
+            var treePanel = $("#tree").treePanel(options);
+
+
+            $('.list-group-item').click(function (event) {
+                var me = $(this);
+
+                var eventTarget = $(event.target);
+                if (eventTarget[0].tagName == 'A') {
+                    eventTarget.toggleClass('active');
+                } else if (eventTarget[0].tagName == 'I') {
+                    var nodeContainer = me.next();
+                    nodeContainer.toggle('fast');
+
+                    var nodeIcon = me.find('i.node-icon');
+                    if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') > 0) {
+                        nodeIcon.removeClass('glyphicon-chevron-right');
+                        nodeIcon.addClass('glyphicon-chevron-down');
+                    } else {
+                        nodeIcon.removeClass('glyphicon-chevron-down');
+                        nodeIcon.addClass('glyphicon-chevron-right');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
