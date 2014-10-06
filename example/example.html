@@ -57,7 +57,8 @@
         $(document).ready(function () {
             var options = {
                 expandDepth: 1,
-                hasBorder: true,
+                hasBorder: false,
+                valueField: 'number',
                 displayField: 'name',
                 childNodesField: 'nodes',
                 data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1", "nodes": [{ "number": 301, "name": "Third 1" }] }, {"number":201, "name":"Second 2"}] }]'
