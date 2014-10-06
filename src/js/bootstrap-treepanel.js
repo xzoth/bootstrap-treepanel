@@ -19,16 +19,17 @@ $.fn.treePanel = function (options) {
 
             var data = me._options.data;
             for (index in data) {
-                var nodeItem = me._buildNode(data[index], 1);
+                var nodeItem = $(TreePanel.prototype._template.nodeItem);
                 me.$element.append(nodeItem);
+                me._buildNode(nodeItem, data[index], 1);
             }
+
+            me._subscribeEvents();
         },
 
-        _buildNode: function (nodeData, depth) {
+        _buildNode: function (nodeItem, nodeData, depth) {
             var me = this;
-
             nodeData = $(nodeData);
-            var nodeItem = $(TreePanel.prototype._template.nodeItem);
 
             //build indent
             for (var i = 1; i < depth; i++) {
@@ -37,12 +38,12 @@ $.fn.treePanel = function (options) {
             }
 
             //build icon
+            var nodeIcon = $(TreePanel.prototype._template.nodeIcon);
+            nodeItem.append(nodeIcon);
             if (me._options.childNodesField != '') {
                 var childNodes = nodeData.attr(me._options.childNodesField);
-                if (childNodes.length > 0) {
-                    var nodeIcon = $(TreePanel.prototype._template.nodeIcon);
+                if (childNodes && childNodes.length > 0) {
                     nodeIcon.addClass(me._options.collapseIcon);
-                    nodeItem.append(nodeIcon);
                 }
             }
 
@@ -55,15 +56,70 @@ $.fn.treePanel = function (options) {
                     nodeItem.addClass('node-noborder');
                 }
             }
+                        
+            //build child nodes
+            if (me._options.childNodesField != '') {
+                var childNodes = nodeData.attr(me._options.childNodesField);
+                if (childNodes && childNodes.length > 0) {
+                    var childDepth = ++depth;
+                    var childContainer = $(TreePanel.prototype._template.nodeContainer);
+
+                    for (index in childNodes) {
+                        var childNodeItem = $(TreePanel.prototype._template.nodeItem);
+                        childContainer.append(childNodeItem);
+                        me._buildNode(childNodeItem, childNodes[index], childDepth);
+                    }
+
+                    nodeItem.parent().append(childContainer);
+                }
+            }
 
             return nodeItem;
         },
 
         _findNodeData: function (attr, value) {
             var me = this;
-
             var data = me._options.data;
+        },
 
+        _subscribeEvents: function () {
+            var me = this;
+            me._unSubscribeEvents();
+            
+            var nodeSelector = me._getNodeSelector();
+            $(nodeSelector).click(function (event) {
+                var eventTarget = $(event.target);
+                var currTarget = $(event.currentTarget);
+
+                if (eventTarget[0].tagName == 'A') {
+                    eventTarget.toggleClass('active');
+                } else if (eventTarget[0].tagName == 'I') {
+                    var nodeContainer = currTarget.next();
+                    nodeContainer.toggle('fast');
+
+                    var nodeIcon = currTarget.find('i.node-icon');
+                    if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') > 0) {
+                        nodeIcon.removeClass('glyphicon-chevron-right');
+                        nodeIcon.addClass('glyphicon-chevron-down');
+                    } else {
+                        nodeIcon.removeClass('glyphicon-chevron-down');
+                        nodeIcon.addClass('glyphicon-chevron-right');
+                    }
+                }
+            });
+        },
+
+        _unSubscribeEvents: function () {
+            var me = this;
+
+            var nodeSelector = me._getNodeSelector();
+            $(nodeSelector).off('click');
+        },
+
+        _getNodeSelector: function () {
+            var me = this;
+            var selector = '#' + me.$element.attr('id') + ' .list-group-item';
+            return selector;
         },
 
         _template: {
@@ -78,7 +134,6 @@ $.fn.treePanel = function (options) {
             childNodesField: '',
             expandIcon: 'glyphicon-chevron-down',
             collapseIcon: 'glyphicon-chevron-right',
-
             backColor: '',
             borderColor: '',
             hoverColor: '',

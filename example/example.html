@@ -15,7 +15,7 @@
 <body>
     <p>
         <div class="container">
-            <div class="list-group">
+            <div id="contrast" class="list-group">
                 <a class="list-group-item" href="#">
                     <i class="node-icon glyphicon glyphicon-chevron-down"></i>
                     Root
@@ -59,31 +59,31 @@
                 hasBorder: true,
                 displayField: 'name',
                 childNodesField: 'nodes',
-                data: '[{ "number":230, "name":"Root", "nodes":[{ "number":231, "name":"node" }, {"number":232, "name":"node"}] }]'
+                data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1", "nodes": [{ "number": 301, "name": "Third 1" }] }, {"number":201, "name":"Second 2"}] }]'
             };
             var treePanel = $("#tree").treePanel(options);
 
 
-            $('.list-group-item').click(function (event) {
-                var me = $(this);
+            //$('#contrast .list-group-item').click(function (event) {
+            //    var me = $(this);
 
-                var eventTarget = $(event.target);
-                if (eventTarget[0].tagName == 'A') {
-                    eventTarget.toggleClass('active');
-                } else if (eventTarget[0].tagName == 'I') {
-                    var nodeContainer = me.next();
-                    nodeContainer.toggle('fast');
+            //    var eventTarget = $(event.target);
+            //    if (eventTarget[0].tagName == 'A') {
+            //        eventTarget.toggleClass('active');
+            //    } else if (eventTarget[0].tagName == 'I') {
+            //        var nodeContainer = me.next();
+            //        nodeContainer.toggle('fast');
 
-                    var nodeIcon = me.find('i.node-icon');
-                    if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') > 0) {
-                        nodeIcon.removeClass('glyphicon-chevron-right');
-                        nodeIcon.addClass('glyphicon-chevron-down');
-                    } else {
-                        nodeIcon.removeClass('glyphicon-chevron-down');
-                        nodeIcon.addClass('glyphicon-chevron-right');
-                    }
-                }
-            });
+            //        var nodeIcon = me.find('i.node-icon');
+            //        if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') > 0) {
+            //            nodeIcon.removeClass('glyphicon-chevron-right');
+            //            nodeIcon.addClass('glyphicon-chevron-down');
+            //        } else {
+            //            nodeIcon.removeClass('glyphicon-chevron-down');
+            //            nodeIcon.addClass('glyphicon-chevron-right');
+            //        }
+            //    }
+            //});
         });
     </script>
 </body>
