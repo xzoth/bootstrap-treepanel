@@ -1,4 +1,5 @@
 #Bootstrap Tree Panel
+A simple tree view plugin for Bootstrap
 ---
 
 ##Requirements
