@@ -1,6 +1,6 @@
 #Bootstrap Tree Panel
-A simple tree view plugin for Bootstrap
 ---
+A simple tree view plugin for Bootstrap
 
 ##Requirements
 *bootstrap v3.0.3
