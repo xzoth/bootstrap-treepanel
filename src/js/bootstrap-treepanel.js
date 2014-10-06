@@ -43,7 +43,11 @@ $.fn.treePanel = function (options) {
             if (me._options.childNodesField != '') {
                 var childNodes = nodeData.attr(me._options.childNodesField);
                 if (childNodes && childNodes.length > 0) {
-                    nodeIcon.addClass(me._options.collapseIcon);
+                    if (depth <= me._options.expandDepth) {
+                        nodeIcon.addClass(me._options.expandIcon);
+                    } else {
+                        nodeIcon.addClass(me._options.collapseIcon);
+                    }
                 }
             }
 
@@ -56,12 +60,12 @@ $.fn.treePanel = function (options) {
                     nodeItem.addClass('node-noborder');
                 }
             }
-                        
+
             //build child nodes
             if (me._options.childNodesField != '') {
                 var childNodes = nodeData.attr(me._options.childNodesField);
                 if (childNodes && childNodes.length > 0) {
-                    var childDepth = ++depth;
+                    var childDepth = depth + 1;
                     var childContainer = $(TreePanel.prototype._template.nodeContainer);
 
                     for (index in childNodes) {
@@ -71,6 +75,12 @@ $.fn.treePanel = function (options) {
                     }
 
                     nodeItem.parent().append(childContainer);
+
+                    if (depth <= me._options.expandDepth) {
+                        childContainer.show();
+                    } else {
+                        childContainer.hide();
+                    }
                 }
             }
 
@@ -85,7 +95,7 @@ $.fn.treePanel = function (options) {
         _subscribeEvents: function () {
             var me = this;
             me._unSubscribeEvents();
-            
+
             var nodeSelector = me._getNodeSelector();
             $(nodeSelector).click(function (event) {
                 var eventTarget = $(event.target);
@@ -132,14 +142,15 @@ $.fn.treePanel = function (options) {
             displayField: '',
             valueField: '',
             childNodesField: '',
+            expandDepth: 2,
             expandIcon: 'glyphicon-chevron-down',
-            collapseIcon: 'glyphicon-chevron-right',
-            backColor: '',
-            borderColor: '',
-            hoverColor: '',
-            hasBorder: true,
-            isHighlightSelected: true,
-            isEnableLinks: false
+            collapseIcon: 'glyphicon-chevron-right'
+            //backColor: '',
+            //borderColor: '',
+            //hoverColor: '',
+            //hasBorder: true,
+            //isHighlightSelected: true,
+            //isEnableLinks: false
         }
     };
 
