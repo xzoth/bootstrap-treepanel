@@ -23,12 +23,15 @@
     <script>
         $(document).ready(function () {
             var options = {
-                expandDepth: 1,
+                expandDepth: 0,
                 hasBorder: true,
                 valueField: 'number',
                 displayField: 'name',
                 childNodesField: 'nodes',
-                data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1", "nodes": [{ "number": 301, "name": "Third 1" }] }, {"number":201, "name":"Second 2"}] }]'
+                data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1", "nodes": [{ "number": 301, "name": "Third 1" }] }, {"number":202, "name":"Second 2"}] }]',
+                onNodeSelected: function (event, node) {
+                    alert(node.number);
+                }
             };
             var treePanel = $("#tree").treePanel(options);
         });

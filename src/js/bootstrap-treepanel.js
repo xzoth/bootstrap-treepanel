@@ -3,18 +3,19 @@ $.fn.treePanel = function (options) {
     var TreePanel = function (element, options) {
         var me = this;
         me.$element = $(element);
+        me.selectedNode = null;
 
-        if (options.data && (typeof options.data == 'string')) {
+        if (options.data && (typeof options.data === 'string')) {
             options.data = $.parseJSON(options.data);
         }
-        if (options.onNodeSelected && (typeof options.onNodeSelected == 'function')) {
-            me.onNodeSelected = options.onNodeSelected;
-        }
+        
         me._options = $.extend({}, TreePanel.prototype._defaultOptions, options);
         me._render();
     };
 
     TreePanel.prototype = {
+        _nodeCounter: 0,
+
         _render: function () {
             var me = this;
 
@@ -32,7 +33,7 @@ $.fn.treePanel = function (options) {
             var me = this;
             nodeData = $(nodeData);
             var nodeID = me._genNodeID(nodeData);
-            nodeItem.data('nodeId', nodeID);
+            nodeItem.attr('data-nodeId', nodeID);
 
             //build indent
             for (var i = 1; i < depth; i++) {
@@ -90,52 +91,57 @@ $.fn.treePanel = function (options) {
             return nodeItem;
         },
 
-        _findNodeItem: function (nodeId) {
-            var me = this;
-            debugger
-            var selector = me._getNodeSelector();
-            var nodeItem = selector.find('[data-nodeId="' + nodeId + '"]');
-            return nodeItem;
-        },
+        //_findNodeItem: function (nodeId) {
+        //    var me = this;
 
-        _findNodeData: function (attr, value) {
+        //    var selector = me._getNodeSelector();
+        //    var nodeItem = selector.find('[data-nodeId="' + nodeId + '"]');
+        //    return nodeItem;
+        //},
+
+        _findNodeData: function (nodeId) {
             var me = this;
             var data = me._options.data;
+
+            var unique = me._getUniqueByNodeID(nodeId);
+            var fieldName = me._options.valueField;
+            if (fieldName == '') {
+                fieldName = me._options.displayField;
+            }
+
+            var matchFun = function (nodesArray) {
+                var result = [];
+                nodesArray.forEach(function (node) {
+                    var $node = $(node);
+                    if ($node.attr(fieldName) == unique) {
+                        result.push(node);
+                    }
+                    if (me._options.childNodesField != '') {
+                        var childNodes = $node.attr(me._options.childNodesField);
+                        if (childNodes) {
+                            var childMatch = matchFun(childNodes);
+                            result = result.concat(childMatch);
+                        }
+                    }
+                });
+
+                return result;
+            };
+            
+            var nodeData = matchFun(me._options.data);
+            return nodeData[0];
         },
 
         _subscribeEvents: function () {
             var me = this;
             me._unSubscribeEvents();
 
+            if (me._options.onNodeSelected && (typeof me._options.onNodeSelected === 'function')) {
+                me.$element.on('nodeSelected', me._options.onNodeSelected);
+            }
+
             var nodeSelector = me._getNodeSelector();
-            $(nodeSelector).click(function (event) {
-                var eventTarget = $(event.target);
-                var currTarget = $(event.currentTarget);
-
-                if (eventTarget[0].tagName == 'A') {
-                    nodeSelector.each(function () {
-                        if (event.target != this) {
-                            $(this).removeClass('active');
-                        }
-                    });
-                    eventTarget.toggleClass('active');
-
-                    //var item = me._findNodeItem(eventTarget.data('nodeId'));
-
-                } else if (eventTarget[0].tagName == 'I') {
-                    var nodeContainer = currTarget.next();
-                    nodeContainer.toggle('fast');
-
-                    var nodeIcon = currTarget.find('i.node-icon');
-                    if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') > 0) {
-                        nodeIcon.removeClass('glyphicon-chevron-right');
-                        nodeIcon.addClass('glyphicon-chevron-down');
-                    } else {
-                        nodeIcon.removeClass('glyphicon-chevron-down');
-                        nodeIcon.addClass('glyphicon-chevron-right');
-                    }
-                }
-            });
+            $(nodeSelector).on('click', $.proxy(me._elementClickHandler, me));
         },
 
         _unSubscribeEvents: function () {
@@ -143,6 +149,54 @@ $.fn.treePanel = function (options) {
 
             var nodeSelector = me._getNodeSelector();
             $(nodeSelector).off('click');
+        },
+
+        _elementClickHandler: function (event) {
+            var me = this;
+            var eventTarget = $(event.target);
+            var currTarget = $(event.currentTarget);
+
+            if (eventTarget[0].tagName == 'A') {
+                me._getNodeSelector().each(function () {
+                    if (event.target != this) {
+                        $(this).removeClass('active');
+                    }
+                });
+                eventTarget.toggleClass('active');
+                me._setSelectedNode(eventTarget);
+
+            } else if (eventTarget[0].tagName == 'I') {
+                var nodeContainer = currTarget.next();
+                nodeContainer.toggle('fast');
+
+                var nodeIcon = currTarget.find('i.node-icon');
+                if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') >= 0) {
+                    nodeIcon.removeClass('glyphicon-chevron-right');
+                    nodeIcon.addClass('glyphicon-chevron-down');
+                } else {
+                    nodeIcon.removeClass('glyphicon-chevron-down');
+                    nodeIcon.addClass('glyphicon-chevron-right');
+                }
+            }
+        },
+
+        _setSelectedNode: function (target) {
+            var me = this;
+            var nodeId = target.attr('data-nodeId');
+                        
+            if (target.attr('class').indexOf('active') > -1) {
+                var nodeData = me._findNodeData(nodeId);
+                me.selectedNode = nodeData;
+                me._triggerNodeSelectedEvent(nodeData);
+            } else {
+                me.selectedNode = null;
+            }
+        },
+
+        _triggerNodeSelectedEvent: function(nodeData){
+            var me = this;
+            
+            me.$element.trigger('nodeSelected', [$.extend(true, {}, nodeData)]);
         },
 
         _genNodeID: function (nodeData) {
@@ -153,7 +207,14 @@ $.fn.treePanel = function (options) {
             } else if (me._options.displayField != '') {
                 nodeID = nodeID + nodeData.attr(me._options.displayField);
             }
+            else {
+                nodeID = nodeID + ++me._nodeCounter;
+            }
             return nodeID;
+        },
+
+        _getUniqueByNodeID: function (nodeId) {
+            return nodeId.substring(5);
         },
 
         _getNodeSelector: function () {
@@ -181,9 +242,7 @@ $.fn.treePanel = function (options) {
             hasBorder: true,
             //isHighlightSelected: true,
             //isEnableLinks: false
-            onNodeSelected: function (node) {
-
-            }
+            onNodeSelected: function (node) {}
         }
     };
 
