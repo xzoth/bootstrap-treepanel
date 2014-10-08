@@ -23,6 +23,8 @@
         <div class="container">
             <button name="btnSelect">Select Top 2</button>
             <button name="btnDisSelect">DisSelect</button>
+            <button name="btnExpand">Expand Top 2</button>
+            <button name="btnCollapse">Collapse Top 2</button>
         </div>
     </p>
 
@@ -46,7 +48,14 @@
                 treePanel.select({ number: 102 });
             });
             $('button[name="btnDisSelect"]').click(function () {
+                //alert(treePanel.selectedNode.number);
                 treePanel.disSelect();
+            });
+            $('button[name="btnExpand"]').click(function () {
+                treePanel.expand('102');
+            });
+            $('button[name="btnCollapse"]').click(function () {
+                treePanel.collapse({ number: 102 });
             });
         });
     </script>

@@ -17,11 +17,38 @@ $.fn.treePanel = function (options) {
         _nodeCounter: 0,
 
         remove: function (node) {
+            var me = this;
 
+            var nodeId = me._genNodeID(node);
+            var nodeData = me._findNodeData(nodeId);
         },
 
         expand: function (node) {
+            var me = this;
+            var nodeId = me._genNodeID(node);
+            var nodeItem = me._findNodeItem(nodeId);
 
+            var nodeIcon = nodeItem.find('i.node-icon');
+            if (nodeIcon && nodeIcon.attr('class').indexOf('glyphicon-chevron-right') >= 0) {
+                var nodeContainer = nodeItem.next();
+                nodeContainer.show('fast');
+                nodeIcon.removeClass('glyphicon-chevron-right');
+                nodeIcon.addClass('glyphicon-chevron-down');
+            }
+        },
+
+        collapse: function (node) {
+            var me = this;
+            var nodeId = me._genNodeID(node);
+            var nodeItem = me._findNodeItem(nodeId);
+
+            var nodeIcon = nodeItem.find('i.node-icon');
+            if (nodeIcon && nodeIcon.attr('class').indexOf('glyphicon-chevron-right') < 0) {
+                var nodeContainer = nodeItem.next();
+                nodeContainer.hide('fast');
+                nodeIcon.removeClass('glyphicon-chevron-down');
+                nodeIcon.addClass('glyphicon-chevron-right');
+            }
         },
 
         select: function (node) {
@@ -190,26 +217,21 @@ $.fn.treePanel = function (options) {
             var eventTarget = $(event.target);
             var currTarget = $(event.currentTarget);
 
+            var nodeId = eventTarget.attr('data-nodeId');
+            var nodeData = me._findNodeData(nodeId);
+
             if (eventTarget[0].tagName == 'A') {
-                var nodeId = eventTarget.attr('data-nodeId');
-                var nodeData = me._findNodeData(nodeId);
                 if (me.selectedNode == nodeData) {
                     me.disSelect.call(me, nodeData);
                 } else {
                     me.select.call(me, nodeData);
                 }
-
             } else if (eventTarget[0].tagName == 'I') {
-                var nodeContainer = currTarget.next();
-                nodeContainer.toggle('fast');
-
                 var nodeIcon = currTarget.find('i.node-icon');
                 if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') >= 0) {
-                    nodeIcon.removeClass('glyphicon-chevron-right');
-                    nodeIcon.addClass('glyphicon-chevron-down');
+                    me.expand(nodeData);
                 } else {
-                    nodeIcon.removeClass('glyphicon-chevron-down');
-                    nodeIcon.addClass('glyphicon-chevron-right');
+                    me.collapse(nodeData);
                 }
             }
         },
