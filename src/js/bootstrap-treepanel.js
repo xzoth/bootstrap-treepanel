@@ -217,7 +217,7 @@ $.fn.treePanel = function (options) {
             var eventTarget = $(event.target);
             var currTarget = $(event.currentTarget);
 
-            var nodeId = eventTarget.attr('data-nodeId');
+            var nodeId = currTarget.attr('data-nodeId');
             var nodeData = me._findNodeData(nodeId);
 
             if (eventTarget[0].tagName == 'A') {
