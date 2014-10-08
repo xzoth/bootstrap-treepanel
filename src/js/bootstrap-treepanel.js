@@ -26,15 +26,17 @@ $.fn.treePanel = function (options) {
 
         select: function (node) {
             var me = this;
-            me._cleanSelection();
 
-            var nodeId = me._genNodeID(node);            
-            var nodeItem = me._findNodeItem(nodeId);
-            nodeItem.addClass('active');
-
+            var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
-            me.selectedNode = nodeData;
-            me._triggerNodeSelectedEvent(nodeData);
+            if (me.selectedNode != nodeData) {
+                me._cleanSelection();
+                var nodeItem = me._findNodeItem(nodeId);
+                nodeItem.addClass('active');
+
+                me.selectedNode = nodeData;
+                me._triggerNodeSelectedEvent(nodeData);
+            }
         },
 
         disSelect: function (node) {
@@ -120,7 +122,7 @@ $.fn.treePanel = function (options) {
 
         _findNodeItem: function (nodeId) {
             var me = this;
-            
+
             var selector = me._getNodeSelector();
             for (index in selector) {
                 var $item = $(selector[index]);
@@ -246,7 +248,7 @@ $.fn.treePanel = function (options) {
             return unique;
         },
 
-        _cleanSelection: function(){
+        _cleanSelection: function () {
             var me = this;
             me._getNodeSelector().each(function () {
                 $(this).removeClass('active');

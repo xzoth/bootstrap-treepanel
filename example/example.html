@@ -12,14 +12,19 @@
     <script src="resources/bootstrap/bootstrap.min.js"></script>
     <script src="../src/js/bootstrap-treepanel.js"></script>
 </head>
-<body> 
+<body>
     <p>
         <div class="container">
             <div id="tree" class="list-group">
             </div>
         </div>
-    </p>   
-    
+    </p>
+    <p>
+        <div class="container">
+            <button name="btnSelect">Select Top 2</button>
+        </div>
+    </p>
+
     <script>
         $(document).ready(function () {
             var options = {
@@ -35,7 +40,10 @@
             };
             var treePanel = $("#tree").treePanel(options);
 
-            //treePanel.remove({ number: 999, name: 'hi'});
+            $('button[name="btnSelect"]').click(function () {
+                //treePanel.select('102');
+                treePanel.select({ number: 102 });
+            });
         });
     </script>
 </body>
