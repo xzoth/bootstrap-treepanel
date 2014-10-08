@@ -21,6 +21,20 @@ $.fn.treePanel = function (options) {
 
             var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
+            var nodeItem = me._findNodeItem(nodeId);
+            if (me.selectedNode == nodeData) {
+                me.disSelect(nodeData);
+            }
+
+            //remove nodeItem
+            var hasChild = me._hasChild(nodeData);
+            if (hasChild) {
+
+            } else {
+
+            }
+
+            //remove nodeData
         },
 
         expand: function (node) {
@@ -29,11 +43,11 @@ $.fn.treePanel = function (options) {
             var nodeItem = me._findNodeItem(nodeId);
 
             var nodeIcon = nodeItem.find('i.node-icon');
-            if (nodeIcon && nodeIcon.attr('class').indexOf('glyphicon-chevron-right') >= 0) {
+            if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
                 var nodeContainer = nodeItem.next();
                 nodeContainer.show('fast');
-                nodeIcon.removeClass('glyphicon-chevron-right');
-                nodeIcon.addClass('glyphicon-chevron-down');
+                nodeIcon.removeClass(me._options.collapseIcon);
+                nodeIcon.addClass(me._options.expandIcon);
             }
         },
 
@@ -43,11 +57,11 @@ $.fn.treePanel = function (options) {
             var nodeItem = me._findNodeItem(nodeId);
 
             var nodeIcon = nodeItem.find('i.node-icon');
-            if (nodeIcon && nodeIcon.attr('class').indexOf('glyphicon-chevron-right') < 0) {
+            if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) < 0) {
                 var nodeContainer = nodeItem.next();
                 nodeContainer.hide('fast');
-                nodeIcon.removeClass('glyphicon-chevron-down');
-                nodeIcon.addClass('glyphicon-chevron-right');
+                nodeIcon.removeClass(me._options.expandIcon);
+                nodeIcon.addClass(me._options.collapseIcon);
             }
         },
 
@@ -193,6 +207,20 @@ $.fn.treePanel = function (options) {
             return nodeData[0];
         },
 
+        _hasChild: function(nodeData){
+            var me = this;
+
+            $nodeData = $(nodeData);
+            if (me._options.childNodesField != '') {
+                var childNodes = $nodeData.attr(me._options.childNodesField);
+                if (childNodes && childNodes.length > 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
         _subscribeEvents: function () {
             var me = this;
             me._unSubscribeEvents();
@@ -228,7 +256,7 @@ $.fn.treePanel = function (options) {
                 }
             } else if (eventTarget[0].tagName == 'I') {
                 var nodeIcon = currTarget.find('i.node-icon');
-                if (nodeIcon.attr('class').indexOf('glyphicon-chevron-right') >= 0) {
+                if (nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
                     me.expand(nodeData);
                 } else {
                     me.collapse(nodeData);
