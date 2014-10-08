@@ -8,13 +8,40 @@ $.fn.treePanel = function (options) {
         if (options.data && (typeof options.data === 'string')) {
             options.data = $.parseJSON(options.data);
         }
-        
+
         me._options = $.extend({}, TreePanel.prototype._defaultOptions, options);
         me._render();
     };
 
     TreePanel.prototype = {
         _nodeCounter: 0,
+
+        remove: function (node) {
+
+        },
+
+        expand: function (node) {
+
+        },
+
+        select: function (node) {
+            var me = this;
+            me._cleanSelection();
+
+            var nodeId = me._genNodeID(node);            
+            var nodeItem = me._findNodeItem(nodeId);
+            nodeItem.addClass('active');
+
+            var nodeData = me._findNodeData(nodeId);
+            me.selectedNode = nodeData;
+            me._triggerNodeSelectedEvent(nodeData);
+        },
+
+        disSelect: function (node) {
+            var me = this;
+            me._cleanSelection();
+            me.selectedNode = null;
+        },
 
         _render: function () {
             var me = this;
@@ -91,17 +118,21 @@ $.fn.treePanel = function (options) {
             return nodeItem;
         },
 
-        //_findNodeItem: function (nodeId) {
-        //    var me = this;
-
-        //    var selector = me._getNodeSelector();
-        //    var nodeItem = selector.find('[data-nodeId="' + nodeId + '"]');
-        //    return nodeItem;
-        //},
+        _findNodeItem: function (nodeId) {
+            var me = this;
+            
+            var selector = me._getNodeSelector();
+            for (index in selector) {
+                var $item = $(selector[index]);
+                var itemNodeId = $item.attr('data-nodeId');
+                if (itemNodeId == nodeId) {
+                    return $item;
+                }
+            }
+        },
 
         _findNodeData: function (nodeId) {
             var me = this;
-            var data = me._options.data;
 
             var unique = me._getUniqueByNodeID(nodeId);
             var fieldName = me._options.valueField;
@@ -115,6 +146,7 @@ $.fn.treePanel = function (options) {
                     var $node = $(node);
                     if ($node.attr(fieldName) == unique) {
                         result.push(node);
+                        return result;
                     }
                     if (me._options.childNodesField != '') {
                         var childNodes = $node.attr(me._options.childNodesField);
@@ -127,7 +159,7 @@ $.fn.treePanel = function (options) {
 
                 return result;
             };
-            
+
             var nodeData = matchFun(me._options.data);
             return nodeData[0];
         },
@@ -157,13 +189,13 @@ $.fn.treePanel = function (options) {
             var currTarget = $(event.currentTarget);
 
             if (eventTarget[0].tagName == 'A') {
-                me._getNodeSelector().each(function () {
-                    if (event.target != this) {
-                        $(this).removeClass('active');
-                    }
-                });
-                eventTarget.toggleClass('active');
-                me._setSelectedNode(eventTarget);
+                var nodeId = eventTarget.attr('data-nodeId');
+                var nodeData = me._findNodeData(nodeId);
+                if (me.selectedNode == nodeData) {
+                    me.disSelect.call(me, nodeData);
+                } else {
+                    me.select.call(me, nodeData);
+                }
 
             } else if (eventTarget[0].tagName == 'I') {
                 var nodeContainer = currTarget.next();
@@ -180,37 +212,45 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        _setSelectedNode: function (target) {
+        _triggerNodeSelectedEvent: function (nodeData) {
             var me = this;
-            var nodeId = target.attr('data-nodeId');
-                        
-            if (target.attr('class').indexOf('active') > -1) {
-                var nodeData = me._findNodeData(nodeId);
-                me.selectedNode = nodeData;
-                me._triggerNodeSelectedEvent(nodeData);
-            } else {
-                me.selectedNode = null;
-            }
-        },
-
-        _triggerNodeSelectedEvent: function(nodeData){
-            var me = this;
-            
             me.$element.trigger('nodeSelected', [$.extend(true, {}, nodeData)]);
         },
 
         _genNodeID: function (nodeData) {
             var me = this;
             var nodeID = 'node_';
-            if (me._options.valueField != '') {
-                nodeID = nodeID + nodeData.attr(me._options.valueField);
-            } else if (me._options.displayField != '') {
-                nodeID = nodeID + nodeData.attr(me._options.displayField);
+            if (typeof nodeData === 'string') {
+                nodeID = nodeID + nodeData;
+            } else {
+                var unique = me._getUniqueByNodeData(nodeData);
+                nodeID = nodeID + unique;
             }
-            else {
-                nodeID = nodeID + ++me._nodeCounter;
-            }
+
             return nodeID;
+        },
+
+        _getUniqueByNodeData: function (nodeData) {
+            var me = this;
+            $nodeData = $(nodeData);
+
+            var unique = '';
+            if (me._options.valueField != '') {
+                unique = $nodeData.attr(me._options.valueField);
+            } else if (me._options.displayField != '') {
+                unique = $nodeData.attr(me._options.displayField);
+            } else {
+                unique = ++me._nodeCounter;
+            }
+
+            return unique;
+        },
+
+        _cleanSelection: function(){
+            var me = this;
+            me._getNodeSelector().each(function () {
+                $(this).removeClass('active');
+            });
         },
 
         _getUniqueByNodeID: function (nodeId) {
@@ -242,7 +282,7 @@ $.fn.treePanel = function (options) {
             hasBorder: true,
             //isHighlightSelected: true,
             //isEnableLinks: false
-            onNodeSelected: function (node) {}
+            onNodeSelected: function (event, node) { }
         }
     };
 
