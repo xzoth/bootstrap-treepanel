@@ -22,6 +22,7 @@
     <p>
         <div class="container">
             <button name="btnSelect">Select Top 2</button>
+            <button name="btnDisSelect">DisSelect</button>
         </div>
     </p>
 
@@ -43,6 +44,9 @@
             $('button[name="btnSelect"]').click(function () {
                 //treePanel.select('102');
                 treePanel.select({ number: 102 });
+            });
+            $('button[name="btnDisSelect"]').click(function () {
+                treePanel.disSelect();
             });
         });
     </script>
