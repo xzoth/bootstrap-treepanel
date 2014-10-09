@@ -25,6 +25,7 @@
             <button name="btnDisSelect">DisSelect</button>
             <button name="btnExpand">Expand Top 2</button>
             <button name="btnCollapse">Collapse Top 2</button>
+            <button name="btnRemove">Remove Selection</button>
         </div>
     </p>
 
@@ -58,6 +59,11 @@
             });
             $('button[name="btnCollapse"]').click(function () {
                 treePanel.collapse({ number: 102 });
+            });
+            $('button[name="btnRemove"]').click(function () {
+                if (treePanel.selectedNode) {
+                    treePanel.remove(treePanel.selectedNode);
+                }
             });
         });
     </script>

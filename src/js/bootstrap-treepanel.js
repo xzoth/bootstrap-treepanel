@@ -22,46 +22,97 @@ $.fn.treePanel = function (options) {
             var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
             var nodeItem = me._findNodeItem(nodeId);
-            if (me.selectedNode == nodeData) {
-                me.disSelect(nodeData);
+            //if current selected node is remove node or child node, then disselect it
+            if (me.selectedNode != null) {
+                if (me.selectedNode == nodeData || me._isChildNode(nodeData, me.selectedNode)) {
+                    me.disSelect(nodeData);
+                }
             }
 
             //remove nodeItem
             var hasChild = me._hasChild(nodeData);
             if (hasChild) {
-
-            } else {
-
+                var nodeContainer = nodeItem.next();
+                nodeContainer.hide('fast', function () {
+                    nodeContainer.remove();
+                });
             }
+            nodeItem.hide('fast', function () {
+                nodeItem.remove();
+            });
 
             //remove nodeData
+
+            var parentNode = me._parentNode(nodeData);
+
+            me._removeNode(nodeData);
+
+
+            //updata parent nodeItem
+
+            if (parentNode) {
+                var hasChild = me._hasChild(parentNode);
+                if (!hasChild) {
+                    var parentNodeItem = me._findNodeItem(me._genNodeID(parentNode));
+                    if (parentNodeItem) {
+                        //remove parent icon                    
+                        var parentItemIcon = parentNodeItem.find('i.node-icon');
+                        if (parentItemIcon.attr('class').indexOf(me._options.collapseIcon) > -1) {
+                            parentItemIcon.removeClass(me._options.collapseIcon);
+                            parentItemIcon.addClass('glyphicon');
+                        }
+                        if (parentItemIcon.attr('class').indexOf(me._options.expandIcon) > -1) {
+                            parentItemIcon.removeClass(me._options.expandIcon);
+                            parentItemIcon.addClass('glyphicon');
+                        }
+                        //remove container
+                        parentNodeItem.next().hide('fast', function () {
+                            $(this).remove();
+                        });
+                    }
+                }
+            }
+
+
         },
 
         expand: function (node) {
             var me = this;
-            var nodeId = me._genNodeID(node);
-            var nodeItem = me._findNodeItem(nodeId);
 
-            var nodeIcon = nodeItem.find('i.node-icon');
-            if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
-                var nodeContainer = nodeItem.next();
-                nodeContainer.show('fast');
-                nodeIcon.removeClass(me._options.collapseIcon);
-                nodeIcon.addClass(me._options.expandIcon);
+            var nodeId = me._genNodeID(node);
+            var nodeData = me._findNodeData(nodeId);
+
+            var hasChild = me._hasChild(nodeData);
+            if (hasChild) {
+                var nodeItem = me._findNodeItem(nodeId);
+
+                var nodeIcon = nodeItem.find('i.node-icon');
+                if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
+                    var nodeContainer = nodeItem.next();
+                    nodeContainer.show('fast');
+                    nodeIcon.removeClass(me._options.collapseIcon);
+                    nodeIcon.addClass(me._options.expandIcon);
+                }
             }
         },
 
         collapse: function (node) {
             var me = this;
-            var nodeId = me._genNodeID(node);
-            var nodeItem = me._findNodeItem(nodeId);
 
-            var nodeIcon = nodeItem.find('i.node-icon');
-            if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) < 0) {
-                var nodeContainer = nodeItem.next();
-                nodeContainer.hide('fast');
-                nodeIcon.removeClass(me._options.expandIcon);
-                nodeIcon.addClass(me._options.collapseIcon);
+            var nodeId = me._genNodeID(node);
+            var nodeData = me._findNodeData(nodeId);
+            var hasChild = me._hasChild(nodeData);
+            if (hasChild) {
+                var nodeId = me._genNodeID(nodeData);
+                var nodeItem = me._findNodeItem(nodeId);
+
+                var nodeIcon = nodeItem.find('i.node-icon');
+                if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) < 0) {
+                    var nodeContainer = nodeItem.next();
+                    nodeContainer.hide('fast');
+                    nodeIcon.removeClass(me._options.expandIcon);
+                    nodeIcon.addClass(me._options.collapseIcon);
+                }
             }
         },
 
@@ -182,32 +233,47 @@ $.fn.treePanel = function (options) {
             if (fieldName == '') {
                 fieldName = me._options.displayField;
             }
-
-            var matchFun = function (nodesArray) {
-                var result = [];
-                nodesArray.forEach(function (node) {
-                    var $node = $(node);
-                    if ($node.attr(fieldName) == unique) {
-                        result.push(node);
-                        return result;
-                    }
-                    if (me._options.childNodesField != '') {
-                        var childNodes = $node.attr(me._options.childNodesField);
-                        if (childNodes) {
-                            var childMatch = matchFun(childNodes);
-                            result = result.concat(childMatch);
-                        }
-                    }
-                });
-
-                return result;
+            var matchFilter = function ($node) {
+                if ($node.attr(fieldName) == unique) {
+                    return true;
+                }
+                return false;
             };
 
-            var nodeData = matchFun(me._options.data);
-            return nodeData[0];
+            var resultArray = me._scanTreeData(matchFilter);
+            return resultArray[0];
         },
 
-        _hasChild: function(nodeData){
+        _scanTreeData: function (filterFun) {
+            var me = this;
+
+            if (filterFun && typeof filterFun === 'function') {
+                var scanFunction = function (nodeArray) {
+                    var result = [];
+                    nodeArray.forEach(function (node) {
+                        var $node = $(node);
+                        if (filterFun($node)) {
+                            result.push(node);
+                        }
+                        if (me._options.childNodesField != '') {
+                            var childNodes = $node.attr(me._options.childNodesField);
+                            if (childNodes) {
+                                var childMatch = scanFunction(childNodes);
+                                result = result.concat(childMatch);
+                            }
+                        }
+                    });
+
+                    return result;
+                };
+
+                return scanFunction(me._options.data);
+            }
+
+            return [];
+        },
+
+        _hasChild: function (nodeData) {
             var me = this;
 
             $nodeData = $(nodeData);
@@ -298,6 +364,21 @@ $.fn.treePanel = function (options) {
             return unique;
         },
 
+        _getNodeData: function (node) {
+            var me = this;
+
+            if (typeof node === 'string') {
+                var matchFun = function ($item) {
+                    if ($item.attr(me._options.valueField) == node) {
+                        return true;
+                    }
+                };
+                return me._scanTreeData(matchFun);
+            } else {
+                return $(node);
+            }
+        },
+
         _cleanSelection: function () {
             var me = this;
             me._getNodeSelector().each(function () {
@@ -335,6 +416,80 @@ $.fn.treePanel = function (options) {
             //isHighlightSelected: true,
             //isEnableLinks: false
             onNodeSelected: function (event, node) { }
+        },
+
+
+        /*
+        those function should be extend as class: TreeNode
+        */
+        _parentNode: function (nodeData) {
+            var me = this;
+
+            var unique = me._getUniqueByNodeData(nodeData);
+            var filter = function ($node) {
+                var childNodes = me._childNodes($node);
+                if (childNodes) {
+                    for (index in childNodes) {
+                        var itemUnique = me._getUniqueByNodeData(childNodes[index]);
+                        if (unique == itemUnique) {
+                            return true;
+                        }
+                    }
+                }
+            };
+
+            var parentNode = me._scanTreeData(filter);
+            if (parentNode && parentNode.length > 0) {
+                return parentNode[0];
+            } else {
+                return null;
+            }
+        },
+        _childNodes: function (nodeData) {
+            var me = this;
+
+            var childNodes = [];
+            if (me._options.childNodesField != '') {
+                childNodes = $(nodeData).attr(me._options.childNodesField);
+            }
+            return childNodes;
+        },
+        _prevNode: function (nodeData) {
+            var me = this;
+
+        },
+        _nextNode: function (nodeData) {
+            var me = this;
+
+        },
+        _removeNode: function (nodeData) {
+            var me = this;
+            var parentNode = me._parentNode(nodeData);
+            var childNodes = [];
+            if (parentNode) {
+                childNodes = me._childNodes(parentNode);
+            } else {
+                childNodes = me._options.data;
+            }
+
+            var index = childNodes.indexOf(nodeData);
+            childNodes.splice(index, 1);
+        },
+        _isChildNode: function (parentNode, childNode) {
+            var me = this;
+
+            var parentUnique = me._getUniqueByNodeData(parentNode);
+            var p = me._parentNode(childNode);
+            while (p) {
+                var unique = me._getUniqueByNodeData(p);
+                if (parentUnique == unique) {
+                    return true;
+                }
+
+                p = me._parentNode(p);
+            }
+
+            return false;
         }
     };
 
