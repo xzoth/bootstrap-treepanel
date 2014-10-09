@@ -14,7 +14,26 @@ $.fn.treePanel = function (options) {
     };
 
     TreePanel.prototype = {
-        _nodeCounter: 0,
+        update: function (node) {
+            var me = this;
+            var nodeId = me._genNodeID(node);
+            var nodeData = me._findNodeData(nodeId);
+            $.extend(nodeData, node);
+            var text = me._getNodeText(nodeData);
+
+            var nodeItem = me._findNodeItem(nodeId);
+            var oldText = nodeItem.text();
+            var newHtml = nodeItem.html().replace(oldText, text);
+            nodeItem.html(newHtml);
+        },
+
+        add: function (node, parentNode, index) {
+
+        },
+
+        move: function (node, parentNode, index) {
+
+        },
 
         remove: function (node) {
             var me = this;
@@ -42,14 +61,10 @@ $.fn.treePanel = function (options) {
             });
 
             //remove nodeData
-
             var parentNode = me._parentNode(nodeData);
-
             me._removeNode(nodeData);
 
-
             //updata parent nodeItem
-
             if (parentNode) {
                 var hasChild = me._hasChild(parentNode);
                 if (!hasChild) {
@@ -72,8 +87,6 @@ $.fn.treePanel = function (options) {
                     }
                 }
             }
-
-
         },
 
         expand: function (node) {
@@ -81,11 +94,9 @@ $.fn.treePanel = function (options) {
 
             var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
-
             var hasChild = me._hasChild(nodeData);
             if (hasChild) {
                 var nodeItem = me._findNodeItem(nodeId);
-
                 var nodeIcon = nodeItem.find('i.node-icon');
                 if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
                     var nodeContainer = nodeItem.next();
@@ -105,7 +116,6 @@ $.fn.treePanel = function (options) {
             if (hasChild) {
                 var nodeId = me._genNodeID(nodeData);
                 var nodeItem = me._findNodeItem(nodeId);
-
                 var nodeIcon = nodeItem.find('i.node-icon');
                 if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) < 0) {
                     var nodeContainer = nodeItem.next();
@@ -125,7 +135,6 @@ $.fn.treePanel = function (options) {
                 me._cleanSelection();
                 var nodeItem = me._findNodeItem(nodeId);
                 nodeItem.addClass('active');
-
                 me.selectedNode = nodeData;
                 me._triggerNodeSelectedEvent(nodeData);
             }
@@ -178,7 +187,7 @@ $.fn.treePanel = function (options) {
 
             //build node
             if (me._options.displayField != '') {
-                var text = nodeData.attr(me._options.displayField);
+                var text = me._getNodeText(nodeData);
                 nodeItem.append(text);
 
                 if (!me._options.hasBorder) {
@@ -364,6 +373,13 @@ $.fn.treePanel = function (options) {
             return unique;
         },
 
+        _getNodeText: function (nodeData) {
+            var me = this;
+
+            var text = $(nodeData).attr(me._options.displayField);
+            return text;
+        },
+
         _getNodeData: function (node) {
             var me = this;
 
@@ -396,6 +412,7 @@ $.fn.treePanel = function (options) {
             return $(selector);
         },
 
+        _nodeCounter: 0,
         _template: {
             nodeItem: '<a class="list-group-item" href="#"></a>',
             nodeContainer: '<span class="node-container"></span>',

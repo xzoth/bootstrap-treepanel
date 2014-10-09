@@ -31,6 +31,7 @@
             <button name="btnExpand">Expand Top 2</button>
             <button name="btnCollapse">Collapse Top 2</button>
             <button name="btnRemove">Remove Selection</button>
+            <button name="btnUpdate">Update Selection Text</button>
         </div>
     </p>
 
@@ -79,6 +80,13 @@
             $('button[name="btnRemove"]').click(function () {
                 if (treePanel.selectedNode) {
                     treePanel.remove(treePanel.selectedNode);
+                }
+            });
+            $('button[name="btnUpdate"]').click(function () {
+                if (treePanel.selectedNode) {
+                    //treePanel.selectedNode.name = 'bootstrap-treePanel';
+                    //treePanel.update(treePanel.selectedNode);
+                    treePanel.update({ number: treePanel.selectedNode.number, name: 'hi'});
                 }
             });
         });
