@@ -21,6 +21,11 @@
     </p>
     <p>
         <div class="container">
+            <div class="alert alert-info" style="display:none;" role="alert"></div>
+        </div>
+    </p>
+    <p>
+        <div class="container">
             <button name="btnSelect">Select Top 2</button>
             <button name="btnDisSelect">DisSelect</button>
             <button name="btnExpand">Expand Top 2</button>
@@ -30,6 +35,17 @@
     </p>
 
     <script>
+        window.demo = {
+            showMsg: function (text) {
+                var msgBox = $('div[role=alert]');
+                msgBox.stop();
+                msgBox.text(text);
+                msgBox.show('fast', function () {
+                    $(this).delay(3000).hide('fast');
+                });
+            }
+        };
+
         $(document).ready(function () {
             var options = {
                 expandDepth: 0,
@@ -41,7 +57,7 @@
                 collapseIcon: 'glyphicon glyphicon-plus',
                 data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1", "nodes": [{ "number": 301, "name": "Third 1" }] }, {"number":202, "name":"Second 2"}] }]',
                 onNodeSelected: function (event, node) {
-                    alert('you select: ' + node.name);
+                    demo.showMsg('you select: ' + node.name);
                 }
             };
             var treePanel = $("#tree").treePanel(options);
