@@ -2,8 +2,8 @@
 A simple tree view plugin for Bootstrap
 
 ##Requirements
-*bootstrap v3.0.3  
-*jQuery v2.1.0  
+- [bootstrap v3.0.3][1]  
+- [jQuery v2.1.0][2]  
 
 ##Usage
 
@@ -53,3 +53,5 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 
+[1]: http://getbootstrap.com
+[2]: https://jQuery.org
