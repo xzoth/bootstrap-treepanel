@@ -49,7 +49,7 @@ $.fn.treePanel = function (options) {
                             childNode.push(node);
                         }
                     } else {
-                        parentNode.attr(me._options.childNodesField, [node]);
+                        $(parentNode).attr(me._options.childNodesField, [node]);
                     }
                 }
             } else {
@@ -70,8 +70,8 @@ $.fn.treePanel = function (options) {
             if (parentNode) {
                 var parentNodeId = me._genNodeID(parentNode)
                 var parentNodeItem = me._findNodeItem(parentNodeId);
-                if (me._hasChild(parentNode)) {
-                    var childNode = me._childNodes(parentNode);
+                var childNode = me._childNodes(parentNode);
+                if (me._hasChild(parentNode) && childNode.length > 1) {
                     if (index != null) {
                         if (index > 0) {
                             var beforeNode = childNode[index - 1];
@@ -90,12 +90,13 @@ $.fn.treePanel = function (options) {
                     }
                 } else {
                     var childContainer = $(TreePanel.prototype._template.nodeContainer);
-                    parentNodeItem.append(childContainer);
+                    parentNodeItem.after(childContainer);
                     childContainer.append(nodeItem);
 
                     //change parent icon
                     var parentIcon = parentNodeItem.find('i');
                     parentIcon.addClass(me._options.collapseIcon);
+                    childContainer.hide();
                 }
 
             } else {
