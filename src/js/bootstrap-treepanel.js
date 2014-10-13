@@ -32,6 +32,10 @@ $.fn.treePanel = function (options) {
         add: function (node, parent, index) {
             var me = this;
 
+            if (typeof node === 'string') {
+                node = $.parseJSON(node);
+            }
+
             var parentNode = null;
             //append to data
             if (parent) {
