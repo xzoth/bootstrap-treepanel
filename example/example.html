@@ -32,6 +32,8 @@
             <button name="btnCollapse">Collapse Top 2</button>
             <button name="btnRemove">Remove Selection</button>
             <button name="btnUpdate">Update Selection Text</button>
+            <button name="btnAddTop">Add Top 3</button>
+            <button name="btnAddThird">Add Thidr 2</button>
         </div>
     </p>
 
@@ -49,14 +51,14 @@
 
         $(document).ready(function () {
             var options = {
-                expandDepth: 0,
+                expandDepth: 1,
                 hasBorder: true,
                 valueField: 'number',
                 displayField: 'name',
                 childNodesField: 'nodes',
-                expandIcon: 'glyphicon glyphicon-minus',
-                collapseIcon: 'glyphicon glyphicon-plus',
-                data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1", "nodes": [{ "number": 301, "name": "Third 1" }] }, {"number":202, "name":"Second 2"}] }]',
+                expandIcon: 'glyphicon-minus',
+                collapseIcon: 'glyphicon-plus',
+                data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1" }, {"number":202, "name":"Second 2", "nodes": [{ "number": 301, "name": "Third 1" }]}] }]',
                 onNodeSelected: function (event, node) {
                     demo.showMsg('you select: ' + node.name);
                 }
@@ -86,8 +88,23 @@
                 if (treePanel.selectedNode) {
                     //treePanel.selectedNode.name = 'bootstrap-treePanel';
                     //treePanel.update(treePanel.selectedNode);
-                    treePanel.update({ number: treePanel.selectedNode.number, name: 'hi'});
+                    treePanel.update({ number: treePanel.selectedNode.number, name: 'hi' });
                 }
+            });
+            $('button[name="btnAddTop"]').click(function () {
+                treePanel.add({ number: 103, name: 'Top 3' });
+                $(this).attr('disabled', true);
+            });
+            $('button[name="btnAddThird"]').click(function () {
+                var third2 = {
+                    number: 302,
+                    name: 'Third 2',
+                    nodes: [
+                        { number: 401, name: 'Fourth 1' }
+                    ]
+                };
+                treePanel.add(third2, '202', 0);
+                $(this).attr('disabled', true);
             });
         });
     </script>

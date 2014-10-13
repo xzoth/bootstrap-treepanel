@@ -10,6 +10,8 @@ $.fn.treePanel = function (options) {
         }
 
         me._options = $.extend({}, TreePanel.prototype._defaultOptions, options);
+        delete options;
+
         me._render();
     };
 
@@ -27,8 +29,77 @@ $.fn.treePanel = function (options) {
             nodeItem.html(newHtml);
         },
 
-        add: function (node, parentNode, index) {
+        add: function (node, parent, index) {
+            var me = this;
 
+            var parentNode = null;
+            //append to data
+            if (parent) {
+                parentNode = me._getNodeData(parent);
+                if (parentNode) {
+                    if (me._hasChild(parentNode)) {
+                        var childNode = me._childNodes(parentNode);
+                        if (index != null) {
+                            childNode.splice(index, 0, node);
+                        } else {
+                            childNode.push(node);
+                        }
+                    } else {
+                        parentNode.attr(me._options.childNodesField, [node]);
+                    }
+                }
+            } else {
+                if (index != null) {
+                    me._options.data.splice(index, 0, node);
+                } else {
+                    me._options.data.push(node);
+                }
+            }
+
+            //params
+            var nodeId = me._genNodeID(node);
+            var nodeData = me._findNodeData(nodeId);
+            var depth = me._getDepth(nodeData);
+            var nodeItem = $(TreePanel.prototype._template.nodeItem);
+
+            //append nodeItem
+            if (parentNode) {
+                var parentNodeId = me._genNodeID(parentNode)
+                var parentNodeItem = me._findNodeItem(parentNodeId);
+                if (me._hasChild(parentNode)) {
+                    var childNode = me._childNodes(parentNode);
+                    if (index != null) {
+                        if (index > 0) {
+                            var beforeNode = childNode[index - 1];
+                            var beforeNodeId = me._genNodeID(beforeNode);
+                            var beforeNodeItem = me._findNodeItem(beforeNodeId);
+                            beforeNodeItem.after(nodeItem);
+                        } else {
+                            var afterNode = childNode[1];
+                            var afterNodeId = me._genNodeID(afterNode);
+                            var afterNodeItem = me._findNodeItem(afterNodeId);
+                            afterNodeItem.before(nodeItem);
+                        }
+                    } else {
+                        var childContainer = parentNodeItem.next();
+                        childContainer.append(nodeItem);
+                    }
+                } else {
+                    var childContainer = $(TreePanel.prototype._template.nodeContainer);
+                    parentNodeItem.append(childContainer);
+                    childContainer.append(nodeItem);
+
+                    //change parent icon
+                    var parentIcon = parentNodeItem.find('i');
+                    parentIcon.addClass(me._options.collapseIcon);
+                }
+
+            } else {
+                me.$element.append(nodeItem);
+            }
+
+            me._buildNode(nodeItem, nodeData, depth);
+            me._subscribeEvents();
         },
 
         move: function (node, parentNode, index) {
@@ -41,7 +112,7 @@ $.fn.treePanel = function (options) {
             var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
             var nodeItem = me._findNodeItem(nodeId);
-            //if current selected node is remove node or child node, then disselect it
+            //if current selected node is removing node or child node, then disselect it
             if (me.selectedNode != null) {
                 if (me.selectedNode == nodeData || me._isChildNode(nodeData, me.selectedNode)) {
                     me.disSelect(nodeData);
@@ -74,11 +145,9 @@ $.fn.treePanel = function (options) {
                         var parentItemIcon = parentNodeItem.find('i.node-icon');
                         if (parentItemIcon.attr('class').indexOf(me._options.collapseIcon) > -1) {
                             parentItemIcon.removeClass(me._options.collapseIcon);
-                            parentItemIcon.addClass('glyphicon');
                         }
                         if (parentItemIcon.attr('class').indexOf(me._options.expandIcon) > -1) {
                             parentItemIcon.removeClass(me._options.expandIcon);
-                            parentItemIcon.addClass('glyphicon');
                         }
                         //remove container
                         parentNodeItem.next().hide('fast', function () {
@@ -208,7 +277,7 @@ $.fn.treePanel = function (options) {
                         me._buildNode(childNodeItem, childNodes[index], childDepth);
                     }
 
-                    nodeItem.parent().append(childContainer);
+                    nodeItem.after(childContainer);
 
                     if (depth <= me._options.expandDepth) {
                         childContainer.show();
@@ -313,6 +382,10 @@ $.fn.treePanel = function (options) {
 
             var nodeSelector = me._getNodeSelector();
             $(nodeSelector).off('click');
+
+            if (me._options.onNodeSelected && (typeof me._options.onNodeSelected === 'function')) {
+                me.$element.off('nodeSelected', me._options.onNodeSelected);
+            }
         },
 
         _elementClickHandler: function (event) {
@@ -439,6 +512,19 @@ $.fn.treePanel = function (options) {
         /*
         those function should be extend as class: TreeNode
         */
+        _getDepth: function (node) {
+            var me = this;
+
+            var depth = 1;
+            var nodeData = me._getNodeData(node);
+            var parentNode = me._parentNode(nodeData);
+            while (parentNode) {
+                depth++;
+                parentNode = me._parentNode(parentNode);
+            }
+
+            return depth;
+        },
         _parentNode: function (nodeData) {
             var me = this;
 
