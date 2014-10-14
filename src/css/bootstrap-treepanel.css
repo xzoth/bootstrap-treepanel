@@ -8,7 +8,7 @@ i.node-icon {
     margin-right: 5px;
 }
 
-.node-noborder{
+.node-noborder {
     border: none;
 }
 
@@ -17,7 +17,6 @@ span.node-container {
     height: 100%;
 }
 
-span a{
+span a {
     margin-bottom: -1px !important;
 }
-

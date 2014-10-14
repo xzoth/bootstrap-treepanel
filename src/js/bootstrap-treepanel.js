@@ -65,6 +65,7 @@ $.fn.treePanel = function (options) {
             var nodeData = me._findNodeData(nodeId);
             var depth = me._getDepth(nodeData);
             var nodeItem = $(TreePanel.prototype._template.nodeItem);
+            nodeItem.hide();
 
             //append nodeItem
             if (parentNode) {
@@ -77,7 +78,11 @@ $.fn.treePanel = function (options) {
                             var beforeNode = childNode[index - 1];
                             var beforeNodeId = me._genNodeID(beforeNode);
                             var beforeNodeItem = me._findNodeItem(beforeNodeId);
-                            beforeNodeItem.after(nodeItem);
+                            if (me._hasChild(beforeNode)) {
+                                beforeNodeItem.next().after(nodeItem);
+                            } else {
+                                beforeNodeItem.after(nodeItem);
+                            }
                         } else {
                             var afterNode = childNode[1];
                             var afterNodeId = me._genNodeID(afterNode);
@@ -93,22 +98,37 @@ $.fn.treePanel = function (options) {
                     parentNodeItem.after(childContainer);
                     childContainer.append(nodeItem);
 
-                    //change parent icon
+                    //update parent icon
                     var parentIcon = parentNodeItem.find('i');
                     parentIcon.addClass(me._options.collapseIcon);
                     childContainer.hide();
                 }
 
             } else {
-                me.$element.append(nodeItem);
+                if (index != null) {
+                    if (index > 0) {
+                        $(me._getNodeSelector()[index]).before(nodeItem);
+                    } else {
+                        me.$element.prepend(nodeItem);
+                    }
+                } else {
+                    me.$element.append(nodeItem);
+                }
             }
 
             me._buildNode(nodeItem, nodeData, depth);
             me._subscribeEvents();
+            
+            nodeItem.show('fast').attr('style', '');
         },
 
-        move: function (node, parentNode, index) {
+        move: function (node, parent, index) {
+            var me = this;
 
+            var nodeData = me._getNodeData(node);
+            var cloneObj = JSON.parse(JSON.stringify(nodeData))
+            me.remove(nodeData);
+            me.add(cloneObj, parent, index);
         },
 
         remove: function (node) {
@@ -467,7 +487,7 @@ $.fn.treePanel = function (options) {
                         return true;
                     }
                 };
-                return me._scanTreeData(matchFun);
+                return me._scanTreeData(matchFun)[0];
             } else {
                 return $(node);
             }

@@ -34,6 +34,7 @@
             <button name="btnUpdate">Update Selection Text</button>
             <button name="btnAddTop">Add Top 3</button>
             <button name="btnAddThird">Add Third 2</button>
+            <button name="btnMove">Move "Second 1" To "Top 1"</button>
         </div>
     </p>
 
@@ -70,7 +71,6 @@
                 treePanel.select({ number: 102 });
             });
             $('button[name="btnDisSelect"]').click(function () {
-                //alert(treePanel.selectedNode.number);
                 treePanel.disSelect();
             });
             $('button[name="btnExpand"]').click(function () {
@@ -86,8 +86,6 @@
             });
             $('button[name="btnUpdate"]').click(function () {
                 if (treePanel.selectedNode) {
-                    //treePanel.selectedNode.name = 'bootstrap-treePanel';
-                    //treePanel.update(treePanel.selectedNode);
                     treePanel.update({ number: treePanel.selectedNode.number, name: 'hi' });
                 }
             });
@@ -104,6 +102,11 @@
                     ]
                 };
                 treePanel.add(third2, '202', 0);
+                $(this).attr('disabled', true);
+            });
+            $('button[name="btnMove"]').click(function () {
+                
+                treePanel.move('201', '101');
                 $(this).attr('disabled', true);
             });
         });
