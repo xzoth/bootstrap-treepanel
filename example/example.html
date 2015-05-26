@@ -62,6 +62,9 @@
                 data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1" }, {"number":202, "name":"Second 2", "nodes": [{ "number": 301, "name": "Third 1" }]}] }]',
                 onNodeSelected: function (event, node) {
                     demo.showMsg('you select: ' + node.name);
+                },
+                onNodeDisSelected: function(event, node) {
+                    alert(node.name);
                 }
             };
             var treePanel = $("#tree").treePanel(options);

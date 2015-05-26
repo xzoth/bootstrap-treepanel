@@ -1,6 +1,6 @@
 
-$.fn.treePanel = function (options) {
-    var TreePanel = function (element, options) {
+$.fn.treePanel = function(options) {
+    var TreePanel = function(element, options) {
         var me = this;
         me.$element = $(element);
         me.selectedNode = null;
@@ -16,7 +16,7 @@ $.fn.treePanel = function (options) {
     };
 
     TreePanel.prototype = {
-        update: function (node) {
+        update: function(node) {
             var me = this;
             var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
@@ -29,7 +29,7 @@ $.fn.treePanel = function (options) {
             nodeItem.html(newHtml);
         },
 
-        add: function (node, parent, index) {
+        add: function(node, parent, index) {
             var me = this;
 
             if (typeof node === 'string') {
@@ -118,11 +118,11 @@ $.fn.treePanel = function (options) {
 
             me._buildNode(nodeItem, nodeData, depth);
             me._subscribeEvents();
-            
+
             nodeItem.show('fast').attr('style', '');
         },
 
-        move: function (node, parent, index) {
+        move: function(node, parent, index) {
             var me = this;
 
             var nodeData = me._getNodeData(node);
@@ -131,7 +131,7 @@ $.fn.treePanel = function (options) {
             me.add(cloneObj, parent, index);
         },
 
-        remove: function (node) {
+        remove: function(node) {
             var me = this;
 
             var nodeId = me._genNodeID(node);
@@ -148,11 +148,11 @@ $.fn.treePanel = function (options) {
             var hasChild = me._hasChild(nodeData);
             if (hasChild) {
                 var nodeContainer = nodeItem.next();
-                nodeContainer.hide('fast', function () {
+                nodeContainer.hide('fast', function() {
                     nodeContainer.remove();
                 });
             }
-            nodeItem.hide('fast', function () {
+            nodeItem.hide('fast', function() {
                 nodeItem.remove();
             });
 
@@ -175,7 +175,7 @@ $.fn.treePanel = function (options) {
                             parentItemIcon.removeClass(me._options.expandIcon);
                         }
                         //remove container
-                        parentNodeItem.next().hide('fast', function () {
+                        parentNodeItem.next().hide('fast', function() {
                             $(this).remove();
                         });
                     }
@@ -183,7 +183,7 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        expand: function (node) {
+        expand: function(node) {
             var me = this;
 
             var nodeId = me._genNodeID(node);
@@ -201,7 +201,7 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        collapse: function (node) {
+        collapse: function(node) {
             var me = this;
 
             var nodeId = me._genNodeID(node);
@@ -220,7 +220,7 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        select: function (node) {
+        select: function(node) {
             var me = this;
 
             var nodeId = me._genNodeID(node);
@@ -234,13 +234,16 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        disSelect: function (node) {
+        disSelect: function(node) {
             var me = this;
             me._cleanSelection();
-            me.selectedNode = null;
+            if (me.selectedNode != null) {
+                me._triggerNodeDisSelectedEvent(me.selectedNode);
+                me.selectedNode = null;
+            }
         },
 
-        _render: function () {
+        _render: function() {
             var me = this;
 
             var data = me._options.data;
@@ -253,7 +256,7 @@ $.fn.treePanel = function (options) {
             me._subscribeEvents();
         },
 
-        _buildNode: function (nodeItem, nodeData, depth) {
+        _buildNode: function(nodeItem, nodeData, depth) {
             var me = this;
             nodeData = $(nodeData);
             var nodeID = me._genNodeID(nodeData);
@@ -315,7 +318,7 @@ $.fn.treePanel = function (options) {
             return nodeItem;
         },
 
-        _findNodeItem: function (nodeId) {
+        _findNodeItem: function(nodeId) {
             var me = this;
 
             var selector = me._getNodeSelector();
@@ -328,7 +331,7 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        _findNodeData: function (nodeId) {
+        _findNodeData: function(nodeId) {
             var me = this;
 
             var unique = me._getUniqueByNodeID(nodeId);
@@ -336,7 +339,7 @@ $.fn.treePanel = function (options) {
             if (fieldName == '') {
                 fieldName = me._options.displayField;
             }
-            var matchFilter = function ($node) {
+            var matchFilter = function($node) {
                 if ($node.attr(fieldName) == unique) {
                     return true;
                 }
@@ -347,13 +350,13 @@ $.fn.treePanel = function (options) {
             return resultArray[0];
         },
 
-        _scanTreeData: function (filterFun) {
+        _scanTreeData: function(filterFun) {
             var me = this;
 
             if (filterFun && typeof filterFun === 'function') {
-                var scanFunction = function (nodeArray) {
+                var scanFunction = function(nodeArray) {
                     var result = [];
-                    nodeArray.forEach(function (node) {
+                    nodeArray.forEach(function(node) {
                         var $node = $(node);
                         if (filterFun($node)) {
                             result.push(node);
@@ -376,7 +379,7 @@ $.fn.treePanel = function (options) {
             return [];
         },
 
-        _hasChild: function (nodeData) {
+        _hasChild: function(nodeData) {
             var me = this;
 
             $nodeData = $(nodeData);
@@ -390,19 +393,22 @@ $.fn.treePanel = function (options) {
             return false;
         },
 
-        _subscribeEvents: function () {
+        _subscribeEvents: function() {
             var me = this;
             me._unSubscribeEvents();
 
             if (me._options.onNodeSelected && (typeof me._options.onNodeSelected === 'function')) {
                 me.$element.on('nodeSelected', me._options.onNodeSelected);
             }
+            if (me._options.onNodeDisSelected && (typeof me._options.onNodeDisSelected === 'function')) {
+                me.$element.on('nodeDisSelected', me._options.onNodeDisSelected);
+            }
 
             var nodeSelector = me._getNodeSelector();
             $(nodeSelector).on('click', $.proxy(me._elementClickHandler, me));
         },
 
-        _unSubscribeEvents: function () {
+        _unSubscribeEvents: function() {
             var me = this;
 
             var nodeSelector = me._getNodeSelector();
@@ -413,7 +419,7 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        _elementClickHandler: function (event) {
+        _elementClickHandler: function(event) {
             var me = this;
             var eventTarget = $(event.target);
             var currTarget = $(event.currentTarget);
@@ -437,12 +443,17 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        _triggerNodeSelectedEvent: function (nodeData) {
+        _triggerNodeSelectedEvent: function(nodeData) {
             var me = this;
             me.$element.trigger('nodeSelected', [$.extend(true, {}, nodeData)]);
         },
 
-        _genNodeID: function (nodeData) {
+        _triggerNodeDisSelectedEvent: function(nodeData) {
+            var me = this;
+            me.$element.trigger('nodeDisSelected', [$.extend(true, {}, nodeData)]);
+        },
+
+        _genNodeID: function(nodeData) {
             var me = this;
             var nodeID = 'node_';
             if (typeof nodeData === 'string') {
@@ -455,7 +466,7 @@ $.fn.treePanel = function (options) {
             return nodeID;
         },
 
-        _getUniqueByNodeData: function (nodeData) {
+        _getUniqueByNodeData: function(nodeData) {
             var me = this;
             $nodeData = $(nodeData);
 
@@ -471,18 +482,18 @@ $.fn.treePanel = function (options) {
             return unique;
         },
 
-        _getNodeText: function (nodeData) {
+        _getNodeText: function(nodeData) {
             var me = this;
 
             var text = $(nodeData).attr(me._options.displayField);
             return text;
         },
 
-        _getNodeData: function (node) {
+        _getNodeData: function(node) {
             var me = this;
 
             if (typeof node === 'string') {
-                var matchFun = function ($item) {
+                var matchFun = function($item) {
                     if ($item.attr(me._options.valueField) == node) {
                         return true;
                     }
@@ -493,18 +504,18 @@ $.fn.treePanel = function (options) {
             }
         },
 
-        _cleanSelection: function () {
+        _cleanSelection: function() {
             var me = this;
-            me._getNodeSelector().each(function () {
+            me._getNodeSelector().each(function() {
                 $(this).removeClass('active');
             });
         },
 
-        _getUniqueByNodeID: function (nodeId) {
+        _getUniqueByNodeID: function(nodeId) {
             return nodeId.substring(5);
         },
 
-        _getNodeSelector: function () {
+        _getNodeSelector: function() {
             var me = this;
             var selector = '#' + me.$element.attr('id') + ' .list-group-item';
             return $(selector);
@@ -530,14 +541,15 @@ $.fn.treePanel = function (options) {
             hasBorder: true,
             //isHighlightSelected: true,
             //isEnableLinks: false
-            onNodeSelected: function (event, node) { }
+            onNodeSelected: function(event, node) { },
+            onNodeDisSelected: function(event, node) { }
         },
 
 
         /*
         those function should be extend as class: TreeNode
         */
-        _getDepth: function (node) {
+        _getDepth: function(node) {
             var me = this;
 
             var depth = 1;
@@ -550,11 +562,11 @@ $.fn.treePanel = function (options) {
 
             return depth;
         },
-        _parentNode: function (nodeData) {
+        _parentNode: function(nodeData) {
             var me = this;
 
             var unique = me._getUniqueByNodeData(nodeData);
-            var filter = function ($node) {
+            var filter = function($node) {
                 var childNodes = me._childNodes($node);
                 if (childNodes) {
                     for (index in childNodes) {
@@ -573,7 +585,7 @@ $.fn.treePanel = function (options) {
                 return null;
             }
         },
-        _childNodes: function (nodeData) {
+        _childNodes: function(nodeData) {
             var me = this;
 
             var childNodes = [];
@@ -582,15 +594,15 @@ $.fn.treePanel = function (options) {
             }
             return childNodes;
         },
-        _prevNode: function (nodeData) {
+        _prevNode: function(nodeData) {
             var me = this;
 
         },
-        _nextNode: function (nodeData) {
+        _nextNode: function(nodeData) {
             var me = this;
 
         },
-        _removeNode: function (nodeData) {
+        _removeNode: function(nodeData) {
             var me = this;
             var parentNode = me._parentNode(nodeData);
             var childNodes = [];
@@ -603,7 +615,7 @@ $.fn.treePanel = function (options) {
             var index = childNodes.indexOf(nodeData);
             childNodes.splice(index, 1);
         },
-        _isChildNode: function (parentNode, childNode) {
+        _isChildNode: function(parentNode, childNode) {
             var me = this;
 
             var parentUnique = me._getUniqueByNodeData(parentNode);
