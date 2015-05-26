@@ -2,16 +2,26 @@
 A simple tree view plugin for Bootstrap
 
 ##Requirements
-- [Bootstrap v3.0.3][1]  
-- [jQuery v2.1.0][2]  
+- [Bootstrap v3.0.3][1] +  
+- [jQuery v2.1.0][2] +
 
 ##Usage
-define a holder: 
+###1. resources reference:
+
+    <link href="bootstrap.min.css" rel="stylesheet" />
+    <link href="bootstrap-treepanel.css" rel="stylesheet" />
+
+    <script src="jquery-2.1.0.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="bootstrap-treepanel.js"></script>
+
+
+###2. define a holder: 
 
 
     <div id="tree" class="list-group"></div>
 
-
+###3. duang duang duang
 basic usage may looks like this:
 
 
@@ -24,12 +34,39 @@ basic usage may looks like this:
 	var treePanel = $("#tree").treePanel(options);
 
 
+##Options
+options is an object for initialization function, that allow you to customise treepanel's default UI & behaviour.
+
+###displayField
+###valueField
+###childNodesField
+###expandDepth
+###expandIcon
+###collapseIcon
+###hasBorder
+
+
+##Methods
+
+###add
+###update
+###move
+###remove
+###expand
+###collapse
+###select
+###disSelect
+
+##Events
+
+###onNodeSelected
+###onNodeDisSelected
 
 
 ##License
 New BSD License
 
-Copyright (c) 2014, vigo All rights reserved.  
+Copyright (c) 2014, All rights reserved.  
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:  
 
