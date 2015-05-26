@@ -52,7 +52,7 @@ IsRequire: true
 Default:none
 
 ###valueField
-property name of object in data, peropety value should unique the object. like ID  
+property name of object in data, peropety value should unique the object. like ID. 
 Type: String      
 IsRequire: true   
 Default:none
@@ -70,13 +70,13 @@ IsRequire: false
 Default: 1
 
 ###expandIcon
-sets the icon to be used on an expandable tree node  
+sets the icon to be used on an expandable tree node.  
 Type: String      
 IsRequire: false   
 Default: glyphicon-chevron-down
 
 ###collapseIcon
-sets the icon to be used on an collapsed tree node  
+sets the icon to be used on an collapsed tree node.  
 Type: String      
 IsRequire: false   
 Default: glyphicon-chevron-right
@@ -89,15 +89,52 @@ Default: true
 
 
 ##Methods
+Methods provide a way of interacting with the plugin programmatically. you can control the treepanel via invoke method. 
 
-###add
-###update
-###move
-###remove
-###expand
-###collapse
-###select
-###disSelect
+all methods 'node' parameter accepts node or nodeId.
+
+###add(node, [parent], [index])
+add a new tree node to treepanel.
+
+    treePanel.add('{ "number": 103, "name": "Top 3" }');
+
+###update(node)
+update a tree node which valueFiled equal to parameter one.
+
+    treePanel.update({ number: treePanel.selectedNode.number, name: 'hi' });
+
+###move(node, [parent], [index])
+move a tree node.
+
+    treePanel.move('201', '101');
+
+###remove(node)
+remove a tree node.
+
+    treePanel.remove(treePanel.selectedNode)
+triggers ***onNodeDisSelected*** event, if removed node is current selected one.
+
+###expand(node)
+expand a given tree node if it's expandable.
+
+    treePanel.expand('102');
+
+###collapse(node)
+collapse a given tree node if it's collapseable.
+
+    treePanel.collapse({ number: 102 });
+
+
+###select(node)
+selects a given tree node.
+
+    treePanel.select({ number: 102 });
+
+###disSelect([node])
+disselect a given tree node, otherwise disselect current selected node.
+
+    treePanel.disSelect();
+
 
 ##Events
 
