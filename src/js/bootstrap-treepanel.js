@@ -226,7 +226,9 @@ $.fn.treePanel = function(options) {
             var nodeId = me._genNodeID(node);
             var nodeData = me._findNodeData(nodeId);
             if (me.selectedNode != nodeData) {
-                me._cleanSelection();
+                if (me.selectedNode != null) {
+                    me.disSelect();
+                }
                 var nodeItem = me._findNodeItem(nodeId);
                 nodeItem.addClass('active');
                 me.selectedNode = nodeData;
@@ -236,8 +238,8 @@ $.fn.treePanel = function(options) {
 
         disSelect: function(node) {
             var me = this;
-            me._cleanSelection();
             if (me.selectedNode != null) {
+                me._cleanSelection();
                 me._triggerNodeDisSelectedEvent(me.selectedNode);
                 me.selectedNode = null;
             }

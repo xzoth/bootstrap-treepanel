@@ -21,7 +21,7 @@
     </p>
     <p>
         <div class="container">
-            <div class="alert alert-info" style="display:none;" role="alert"></div>
+            <div class="alert alert-info" style="display: none;" role="alert"></div>
         </div>
     </p>
     <p>
@@ -40,17 +40,17 @@
 
     <script>
         window.demo = {
-            showMsg: function (text) {
+            showMsg: function(text) {
                 var msgBox = $('div[role=alert]');
                 msgBox.stop();
                 msgBox.text(text);
-                msgBox.show('fast', function () {
+                msgBox.show('fast', function() {
                     $(this).delay(3000).hide('fast');
                 });
             }
         };
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             var options = {
                 expandDepth: 1,
                 hasBorder: true,
@@ -60,43 +60,43 @@
                 expandIcon: 'glyphicon-minus',
                 collapseIcon: 'glyphicon-plus',
                 data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1" }, {"number":202, "name":"Second 2", "nodes": [{ "number": 301, "name": "Third 1" }]}] }]',
-                onNodeSelected: function (event, node) {
+                onNodeSelected: function(event, node) {
                     demo.showMsg('you select: ' + node.name);
                 },
                 onNodeDisSelected: function(event, node) {
-                    alert(node.name);
+                    alert('disselect: ' + node.name);
                 }
             };
             var treePanel = $("#tree").treePanel(options);
 
-            $('button[name="btnSelect"]').click(function () {
+            $('button[name="btnSelect"]').click(function() {
                 //treePanel.select('102');
                 treePanel.select({ number: 102 });
             });
-            $('button[name="btnDisSelect"]').click(function () {
+            $('button[name="btnDisSelect"]').click(function() {
                 treePanel.disSelect();
             });
-            $('button[name="btnExpand"]').click(function () {
+            $('button[name="btnExpand"]').click(function() {
                 treePanel.expand('102');
             });
-            $('button[name="btnCollapse"]').click(function () {
+            $('button[name="btnCollapse"]').click(function() {
                 treePanel.collapse({ number: 102 });
             });
-            $('button[name="btnRemove"]').click(function () {
+            $('button[name="btnRemove"]').click(function() {
                 if (treePanel.selectedNode) {
                     treePanel.remove(treePanel.selectedNode);
                 }
             });
-            $('button[name="btnUpdate"]').click(function () {
+            $('button[name="btnUpdate"]').click(function() {
                 if (treePanel.selectedNode) {
                     treePanel.update({ number: treePanel.selectedNode.number, name: 'hi' });
                 }
             });
-            $('button[name="btnAddTop"]').click(function () {
+            $('button[name="btnAddTop"]').click(function() {
                 treePanel.add('{ "number": 103, "name": "Top 3" }');
                 $(this).attr('disabled', true);
             });
-            $('button[name="btnAddThird"]').click(function () {
+            $('button[name="btnAddThird"]').click(function() {
                 var third2 = {
                     number: 302,
                     name: 'Third 2',
@@ -107,8 +107,8 @@
                 treePanel.add(third2, '202', 0);
                 $(this).attr('disabled', true);
             });
-            $('button[name="btnMove"]').click(function () {
-                
+            $('button[name="btnMove"]').click(function() {
+
                 treePanel.move('201', '101');
                 $(this).attr('disabled', true);
             });
