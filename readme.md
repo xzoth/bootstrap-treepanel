@@ -1,6 +1,8 @@
 #Bootstrap Tree Panel
 A simple tree view plugin for Bootstrap
 
+[DEMO](http://xzoth.github.io/bootstrap-treepanel/ "DEMO")
+
 ##Requirements
 - [Bootstrap v3.0.3][1] +  
 - [jQuery v2.1.0][2] +
@@ -37,13 +39,53 @@ basic usage may looks like this:
 ##Options
 options is an object for initialization function, that allow you to customise treepanel's default UI & behaviour.
 
+###data  
+JSON array string of objects, to display the treepanel.  
+Type: String  
+IsRequire: true  
+Default:none
+
 ###displayField
+property name of object in data, property value will display on treepanel.    
+Type: String     
+IsRequire: true  
+Default:none
+
 ###valueField
+property name of object in data, peropety value should unique the object. like ID  
+Type: String      
+IsRequire: true   
+Default:none
+
 ###childNodesField
+property name of object in data, property value should be a JSON array of object's child nodes.  
+Type: String      
+IsRequire: true   
+Default:none
+
 ###expandDepth
+sets the number of levels deep the treepanel will be expanded to by default.  
+Type: Integer      
+IsRequire: false   
+Default: 1
+
 ###expandIcon
+sets the icon to be used on an expandable tree node  
+Type: String      
+IsRequire: false   
+Default: glyphicon-chevron-down
+
 ###collapseIcon
+sets the icon to be used on an collapsed tree node  
+Type: String      
+IsRequire: false   
+Default: glyphicon-chevron-right
+
 ###hasBorder
+sets whether or not the treepanel has a border.  
+Type: Boolean      
+IsRequire: false   
+Default: true
 
 
 ##Methods
