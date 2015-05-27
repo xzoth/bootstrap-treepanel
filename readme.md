@@ -52,13 +52,13 @@ IsRequire: true
 Default:none
 
 ###valueField
-property name of object in data, peropety value should unique the object. like ID. 
+property name of object in data, property value should unique the object. like ID.     
 Type: String      
 IsRequire: true   
 Default:none
 
 ###childNodesField
-property name of object in data, property value should be a JSON array of object's child nodes.  
+property name of object in data, property value should be a JSON array of object's child nodes.    
 Type: String      
 IsRequire: true   
 Default:none
@@ -137,9 +137,20 @@ disselect a given tree node, otherwise disselect current selected node.
 
 
 ##Events
+you can bind to event then you can respond to changes by using options callback handler.
 
-###onNodeSelected
-###onNodeDisSelected
+    $('#tree').treePanel({
+        onNodeSelected: function(event, node){
+            alert(node.name);
+        }
+    });
+
+###onNodeSelected(event, node)
+a tree node is selected.
+
+###onNodeDisSelected(event, node)
+a tree node is disselected.
+
 
 
 ##License
