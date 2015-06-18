@@ -417,7 +417,10 @@ $.fn.treePanel = function(options) {
             $(nodeSelector).off('click');
 
             if (me._options.onNodeSelected && (typeof me._options.onNodeSelected === 'function')) {
-                me.$element.off('nodeSelected', me._options.onNodeSelected);
+                me.$element.off('nodeSelected');
+            }
+            if (me._options.onNodeDisSelected && (typeof me._options.onNodeDisSelected === 'function')) {
+                me.$element.off('nodeDisSelected');
             }
         },
 
