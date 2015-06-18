@@ -99,7 +99,7 @@ add a new tree node to treepanel.
     treePanel.add('{ "number": 103, "name": "Top 3" }');
 
 ###update(node)
-update a tree node which valueFiled equal to parameter one.
+update a tree node which valueField equal to parameter one.
 
     treePanel.update({ number: treePanel.selectedNode.number, name: 'hi' });
 
@@ -112,7 +112,7 @@ move a tree node.
 remove a tree node.
 
     treePanel.remove(treePanel.selectedNode)
-triggers ***onNodeDisSelected*** event, if removed node is current selected one.
+triggers ***onNodeDisSelected*** event, if removed node is current selected one or child.
 
 ###expand(node)
 expand a given tree node if it's expandable.
