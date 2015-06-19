@@ -148,13 +148,13 @@ $.fn.treePanel = function(options) {
             var hasChild = me._hasChild(nodeData);
             if (hasChild) {
                 var nodeContainer = nodeItem.next();
-                nodeContainer.hide('fast', function() {
+                //nodeContainer.hide('fast', function() {
                     nodeContainer.remove();
-                });
+                //});
             }
-            nodeItem.hide('fast', function() {
+            //nodeItem.hide('fast', function() {
                 nodeItem.remove();
-            });
+            //});
 
             //remove nodeData
             var parentNode = me._parentNode(nodeData);

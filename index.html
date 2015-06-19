@@ -6,11 +6,11 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>bootstrap-treepanel example</title>
     <link href="resources/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="src/css/bootstrap-treepanel.css" rel="stylesheet" />
+    <link href="../src/css/bootstrap-treepanel.css" rel="stylesheet" />
 
     <script src="resources/bootstrap/jquery-2.1.0.min.js"></script>
     <script src="resources/bootstrap/bootstrap.min.js"></script>
-    <script src="src/js/bootstrap-treepanel.js"></script>
+    <script src="../src/js/bootstrap-treepanel.js"></script>
 </head>
 <body>
     <p>
@@ -70,7 +70,6 @@
             var treePanel = $("#tree").treePanel(options);
 
             $('button[name="btnSelect"]').click(function() {
-                //treePanel.select('102');
                 treePanel.select({ number: 102 });
             });
             $('button[name="btnDisSelect"]').click(function() {
@@ -108,7 +107,6 @@
                 $(this).attr('disabled', true);
             });
             $('button[name="btnMove"]').click(function() {
-
                 treePanel.move('201', '101');
                 $(this).attr('disabled', true);
             });
