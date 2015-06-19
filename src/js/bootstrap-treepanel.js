@@ -420,7 +420,7 @@ $.fn.treePanel = function(options) {
                 me.$element.off('nodeSelected');
             }
             if (me._options.onNodeDisSelected && (typeof me._options.onNodeDisSelected === 'function')) {
-                me.$element.on('nodeDisSelected');
+                me.$element.off('nodeDisSelected');
             }
         },
 
