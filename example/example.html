@@ -70,7 +70,6 @@
             var treePanel = $("#tree").treePanel(options);
 
             $('button[name="btnSelect"]').click(function() {
-                //treePanel.select('102');
                 treePanel.select({ number: 102 });
             });
             $('button[name="btnDisSelect"]').click(function() {
@@ -108,7 +107,6 @@
                 $(this).attr('disabled', true);
             });
             $('button[name="btnMove"]').click(function() {
-
                 treePanel.move('201', '101');
                 $(this).attr('disabled', true);
             });
