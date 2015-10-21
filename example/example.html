@@ -65,6 +65,12 @@
                 },
                 onNodeDisSelected: function(event, node) {
                     alert('disselect: ' + node.name);
+                },
+                onNodeExpanded: function(event, node) {
+                    demo.showMsg('expend: ' + node.name);
+                },
+                onNodeCollapsed: function(event, node) {
+                    demo.showMsg('collapse: ' + node.name);
                 }
             };
             var treePanel = $("#tree").treePanel(options);

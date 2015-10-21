@@ -151,6 +151,11 @@ a tree node is selected.
 ###onNodeDisSelected(event, node)
 a tree node is disselected.
 
+###onNodeExpanded(event, node)
+a tree node is expanded
+
+###onNodeCollapsed(event, node)
+a tree node is collapsed
 
 
 ##License
