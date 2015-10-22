@@ -57,8 +57,16 @@
                 valueField: 'number',
                 displayField: 'name',
                 childNodesField: 'nodes',
-                //expandIcon: 'glyphicon-minus',
-                //collapseIcon: 'glyphicon-plus',
+                //expandIcon: 'glyphicon glyphicon-minus',
+                //collapseIcon: 'glyphicon glyphicon-plus',
+                //nodeIcon: 'glyphicon glyphicon-ok-circle',
+                nodeIcon: function(node) {                    
+                    if (node.nodes != null && node.nodes.length > 0) {
+                        return 'glyphicon glyphicon-folder-close';
+                    } else {
+                        return 'glyphicon glyphicon-file';
+                    }
+                },
                 data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1" }, {"number":202, "name":"Second 2", "nodes": [{ "number": 301, "name": "Third 1" }]}] }]',
                 onNodeSelected: function(event, node) {
                     demo.showMsg('you select: ' + node.name);

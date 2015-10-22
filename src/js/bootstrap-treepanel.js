@@ -27,6 +27,9 @@ $.fn.treePanel = function(options) {
             var oldText = nodeItem.text();
             var newHtml = nodeItem.html().replace(oldText, text);
             nodeItem.html(newHtml);
+
+            //rerender node icon
+            me._reRenderNodeIcon(nodeItem, nodeData);
         },
 
         add: function(node, parent, index) {
@@ -97,11 +100,14 @@ $.fn.treePanel = function(options) {
                     var childContainer = $(TreePanel.prototype._template.nodeContainer);
                     parentNodeItem.after(childContainer);
                     childContainer.append(nodeItem);
-
-                    //update parent icon
-                    var parentIcon = parentNodeItem.find('i');
-                    parentIcon.addClass(me._options.collapseIcon);
                     childContainer.hide();
+
+                    //update parent toggle icon
+                    var parentToggleIcon = parentNodeItem.find('i.toggle-icon');
+                    parentToggleIcon.addClass(me._options.collapseIcon);
+                    
+                    //rerender parent node icon
+                    me._reRenderNodeIcon(parentNodeItem, parentNode);
                 }
 
             } else {
@@ -166,14 +172,19 @@ $.fn.treePanel = function(options) {
                 if (!hasChild) {
                     var parentNodeItem = me._findNodeItem(me._genNodeID(parentNode));
                     if (parentNodeItem) {
-                        //remove parent icon                    
-                        var parentItemIcon = parentNodeItem.find('i.node-icon');
-                        if (parentItemIcon.attr('class').indexOf(me._options.collapseIcon) > -1) {
-                            parentItemIcon.removeClass(me._options.collapseIcon);
+                        //remove parent toggle icon                 
+                        var parentToggleIcon = parentNodeItem.find('i.toggle-icon');
+                        if (parentToggleIcon.attr('class').indexOf(me._options.collapseIcon) > -1) {
+                            parentToggleIcon.removeClass(me._options.collapseIcon);
                         }
-                        if (parentItemIcon.attr('class').indexOf(me._options.expandIcon) > -1) {
-                            parentItemIcon.removeClass(me._options.expandIcon);
+                        if (parentToggleIcon.attr('class').indexOf(me._options.expandIcon) > -1) {
+                            parentToggleIcon.removeClass(me._options.expandIcon);
                         }
+                        //fix losting left offset
+                        parentToggleIcon.addClass('glyphicon');
+                        //rerender parent node icon
+                        me._reRenderNodeIcon(parentNodeItem, parentNode);
+
                         //remove container
                         parentNodeItem.next().hide('fast', function() {
                             $(this).remove();
@@ -191,12 +202,12 @@ $.fn.treePanel = function(options) {
             var hasChild = me._hasChild(nodeData);
             if (hasChild) {
                 var nodeItem = me._findNodeItem(nodeId);
-                var nodeIcon = nodeItem.find('i.node-icon');
-                if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
+                var toggleIcon = nodeItem.find('i.toggle-icon');
+                if (toggleIcon && toggleIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
                     var nodeContainer = nodeItem.next();
                     nodeContainer.show('fast');
-                    nodeIcon.removeClass(me._options.collapseIcon);
-                    nodeIcon.addClass(me._options.expandIcon);
+                    toggleIcon.removeClass(me._options.collapseIcon);
+                    toggleIcon.addClass(me._options.expandIcon);
                 }
             }
 
@@ -212,12 +223,12 @@ $.fn.treePanel = function(options) {
             if (hasChild) {
                 var nodeId = me._genNodeID(nodeData);
                 var nodeItem = me._findNodeItem(nodeId);
-                var nodeIcon = nodeItem.find('i.node-icon');
-                if (nodeIcon && nodeIcon.attr('class').indexOf(me._options.collapseIcon) < 0) {
+                var toggleIcon = nodeItem.find('i.toggle-icon');
+                if (toggleIcon && toggleIcon.attr('class').indexOf(me._options.collapseIcon) < 0) {
                     var nodeContainer = nodeItem.next();
                     nodeContainer.hide('fast');
-                    nodeIcon.removeClass(me._options.expandIcon);
-                    nodeIcon.addClass(me._options.collapseIcon);
+                    toggleIcon.removeClass(me._options.expandIcon);
+                    toggleIcon.addClass(me._options.collapseIcon);
                 }
             }
 
@@ -262,6 +273,17 @@ $.fn.treePanel = function(options) {
             me._subscribeEvents();
         },
 
+        _reRenderNodeIcon: function(nodeItem, nodeData) {
+            var me = this;
+            if (typeof me._options.nodeIcon === 'function') {
+                var iconClass = me._options.nodeIcon.call(me, nodeData);
+                var nodeIcon = nodeItem.find('i.node-icon');
+                nodeIcon.removeClass();
+                nodeIcon.addClass('node-icon');
+                nodeIcon.addClass(iconClass);
+            }
+        },
+        
         _buildNode: function(nodeItem, nodeData, depth) {
             var me = this;
             nodeData = $(nodeData);
@@ -274,19 +296,28 @@ $.fn.treePanel = function(options) {
                 nodeItem.append(nodeIndent);
             }
 
-            //build icon
-            var nodeIcon = $(TreePanel.prototype._template.nodeIcon);
-            nodeItem.append(nodeIcon);
+            //build toggle icon
+            var toggleIcon = $(TreePanel.prototype._template.toggleIcon);
+            nodeItem.append(toggleIcon);
             if (me._options.childNodesField != '') {
                 var childNodes = nodeData.attr(me._options.childNodesField);
                 if (childNodes && childNodes.length > 0) {
                     if (depth <= me._options.expandDepth) {
-                        nodeIcon.addClass(me._options.expandIcon);
+                        toggleIcon.addClass(me._options.expandIcon);
                     } else {
-                        nodeIcon.addClass(me._options.collapseIcon);
+                        toggleIcon.addClass(me._options.collapseIcon);
                     }
                 }
             }
+
+            //build node icon
+            var nodeIcon = $(TreePanel.prototype._template.nodeIcon);
+            var iconClass = me._options.nodeIcon;
+            if (typeof me._options.nodeIcon === 'function') {
+                iconClass = me._options.nodeIcon.call(me, nodeData[0]);
+            }
+            nodeIcon.addClass(iconClass);
+            nodeItem.append(nodeIcon);
 
             //build node
             if (me._options.displayField != '') {
@@ -455,11 +486,13 @@ $.fn.treePanel = function(options) {
                     me.select.call(me, nodeData);
                 }
             } else if (eventTarget[0].tagName == 'I') {
-                var nodeIcon = currTarget.find('i.node-icon');
-                if (nodeIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
-                    me.expand(nodeData);
-                } else {
-                    me.collapse(nodeData);
+                if (eventTarget.hasClass('toggle-icon')) {
+                    var toggleIcon = currTarget.find('i.toggle-icon');
+                    if (toggleIcon.attr('class').indexOf(me._options.collapseIcon) >= 0) {
+                        me.expand(nodeData);
+                    } else {
+                        me.collapse(nodeData);
+                    }
                 }
             }
         },
@@ -557,15 +590,17 @@ $.fn.treePanel = function(options) {
             nodeItem: '<a class="list-group-item" href="#"></a>',
             nodeContainer: '<span class="node-container"></span>',
             nodeIndent: '<span class="node-indent"></span>',
-            nodeIcon: '<i class="node-icon glyphicon"></i>',
+            toggleIcon: '<i class="toggle-icon glyphicon"></i>',
+            nodeIcon: '<i class="node-icon"></i>'
         },
         _defaultOptions: {
             displayField: '',
             valueField: '',
             childNodesField: '',
             expandDepth: 2,
-            expandIcon: 'glyphicon-chevron-down',
-            collapseIcon: 'glyphicon-chevron-right',
+            expandIcon: 'glyphicon glyphicon-chevron-down',
+            collapseIcon: 'glyphicon glyphicon-chevron-right',
+            nodeIcon: '',
             hasBorder: true,
             onNodeSelected: function(event, node) { },
             onNodeDisSelected: function(event, node) { },

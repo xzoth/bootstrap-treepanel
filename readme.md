@@ -73,13 +73,27 @@ Default: 1
 sets the icon to be used on an expandable tree node.  
 Type: String      
 IsRequire: false   
-Default: glyphicon-chevron-down
+Default: 'glyphicon glyphicon-chevron-down'
 
 ###collapseIcon
 sets the icon to be used on an collapsed tree node.  
 Type: String      
 IsRequire: false   
-Default: glyphicon-chevron-right
+Default: 'glyphicon glyphicon-chevron-right'
+
+###nodeIcon
+sets the icon of the tree node. Can also be passed of function which will be used as the renderFn config to get icon class.   
+Type: String/function  
+IsRequire: false  
+Default: ''
+
+    nodeIcon: function(node) {                    
+        if (node.nodes != null && node.nodes.length > 0) {
+            return 'glyphicon glyphicon-folder-close';
+        } else {
+            return 'glyphicon glyphicon-file';
+        }
+    }
 
 ###hasBorder
 sets whether or not the treepanel has a border.  
