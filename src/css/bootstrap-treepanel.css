@@ -4,8 +4,13 @@ span.node-indent {
     margin-right: 10px;
 }
 
+i.toggle-icon {
+    margin-right: 5px;
+}
+
 i.node-icon {
     margin-right: 5px;
+    margin-left: 3px;
 }
 
 .node-noborder {
