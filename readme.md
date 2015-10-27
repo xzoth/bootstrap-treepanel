@@ -69,23 +69,13 @@ Type: Integer
 IsRequire: false   
 Default: 1
 
-###expandIcon
-sets the icon to be used on an expandable tree node.  
-Type: String      
-IsRequire: false   
-Default: 'glyphicon glyphicon-chevron-down'
-
-###collapseIcon
-sets the icon to be used on an collapsed tree node.  
-Type: String      
-IsRequire: false   
-Default: 'glyphicon glyphicon-chevron-right'
-
 ###nodeIcon
 sets the icon of the tree node. Can also be passed of function which will be used as the renderFn config to get icon class.   
 Type: String/function  
 IsRequire: false  
 Default: ''
+
+example:
 
     nodeIcon: function(node) {                    
         if (node.nodes != null && node.nodes.length > 0) {
@@ -93,6 +83,55 @@ Default: ''
         } else {
             return 'glyphicon glyphicon-file';
         }
+    }
+
+###toggleIcon
+Type: Object  
+IsRequire: false  
+Default: 
+
+    toggleIcon: {
+        expandIcon: 'glyphicon glyphicon-chevron-down',
+        collapseIcon: 'glyphicon glyphicon-chevron-right',
+    }
+
+
+***expandIcon***  
+sets the icon to be used on an expandable tree node.  
+Type: String      
+IsRequire: false   
+Default: 'glyphicon glyphicon-chevron-down'
+
+***collapseIcon***  
+sets the icon to be used on an collapsed tree node.  
+Type: String      
+IsRequire: false   
+Default: 'glyphicon glyphicon-chevron-right'
+
+***render***  
+toggle icon render function that to override expand/collapse icon settings  
+Type: Function  
+IsRequire: false  
+Default: null  
+
+    toggleIcon: {
+        render: function(node, cfg){
+            //node: is current node
+            //cfg:  is toggleIcon config
+        }
+    }
+
+example: all NodeType=1 node would set icon as collapse Icon
+
+    toggleIcon: {
+        render: function(node, cfg) {
+            if (node.NodeType == 1) {
+                return cfg.collapseIcon;
+            }
+            return '';
+        },
+        expandIcon: 'glyphicon glyphicon-minus',
+        collapseIcon: 'glyphicon glyphicon-plus',
     }
 
 ###hasBorder
@@ -149,6 +188,10 @@ disselect a given tree node, otherwise disselect current selected node.
 
     treePanel.disSelect();
 
+###clean(node)  
+remove all child nodes
+
+    treePanel.clean(treePanel.selectedNode)
 
 ##Events
 you can bind to event then you can respond to changes by using options callback handler.
