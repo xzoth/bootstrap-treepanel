@@ -6,11 +6,11 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>bootstrap-treepanel example</title>
     <link href="resources/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="src/css/bootstrap-treepanel.css" rel="stylesheet" />
+    <link href="../src/css/bootstrap-treepanel.css" rel="stylesheet" />
 
     <script src="resources/bootstrap/jquery-2.1.0.min.js"></script>
     <script src="resources/bootstrap/bootstrap.min.js"></script>
-    <script src="src/js/bootstrap-treepanel.js"></script>
+    <script src="../src/js/bootstrap-treepanel.js"></script>
 </head>
 <body>
     <p>
@@ -37,7 +37,35 @@
             <button name="btnMove">Move "Second 1" To "Top 1"</button>
         </div>
     </p>
-
+    <hr />
+    <p>
+        <div class="container">
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Toggle Icon Render example</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="treeToggle" class="list-group"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <button name="btnSelect2">Select Node 4</button>
+                <button name="btnDisSelect2">DisSelect</button>
+                <button name="btnExpand2">Expand Node 5</button>
+                <button name="btnCollapse2">Collapse Node 5</button>
+                <button name="btnRemove2">Remove Selection</button>
+                <button name="btnUpdate2">Update Selection Text</button>
+                <button name="btnClean">Clean Child</button>
+            </div>
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div id="logArea" class="panel-body" style="overflow-y: scroll; height: 340px;"></div>
+                </div>
+            </div>
+        </div>
+    </p>
     <script>
         window.demo = {
             showMsg: function(text) {
@@ -47,6 +75,8 @@
                 msgBox.show('fast', function() {
                     $(this).delay(3000).hide('fast');
                 });
+            },
+            log: function(text) {
             }
         };
 
@@ -57,14 +87,30 @@
                 valueField: 'number',
                 displayField: 'name',
                 childNodesField: 'nodes',
-                //expandIcon: 'glyphicon-minus',
-                //collapseIcon: 'glyphicon-plus',
+                toggleIcon: {
+                    expandIcon: 'glyphicon glyphicon-minus',
+                    collapseIcon: 'glyphicon glyphicon-plus',
+                },
+                //nodeIcon: 'glyphicon glyphicon-ok-circle',
+                nodeIcon: function(node) {
+                    if (node.nodes != null && node.nodes.length > 0) {
+                        return 'glyphicon glyphicon-folder-close';
+                    } else {
+                        return 'glyphicon glyphicon-file';
+                    }
+                },
                 data: '[{ "number": 101, "name": "Top 1" }, { "number":102, "name":"Top 2", "nodes":[{ "number":201, "name":"Second 1" }, {"number":202, "name":"Second 2", "nodes": [{ "number": 301, "name": "Third 1" }]}] }]',
                 onNodeSelected: function(event, node) {
                     demo.showMsg('you select: ' + node.name);
                 },
                 onNodeDisSelected: function(event, node) {
                     alert('disselect: ' + node.name);
+                },
+                onNodeExpanded: function(event, node) {
+                    demo.showMsg('expend: ' + node.name);
+                },
+                onNodeCollapsed: function(event, node) {
+                    demo.showMsg('collapse: ' + node.name);
                 }
             };
             var treePanel = $("#tree").treePanel(options);
@@ -109,6 +155,89 @@
             $('button[name="btnMove"]').click(function() {
                 treePanel.move('201', '101');
                 $(this).attr('disabled', true);
+            });
+
+
+            //toggle icon render example
+            var nodeCounter = 1;
+            var option2 = {
+                hasBorder: false,
+                valueField: 'ID',
+                displayField: 'Name',
+                childNodesField: 'Nodes',
+                nodeIcon: 'glyphicon glyphicon-picture',
+                toggleIcon: {
+                    render: function(node, cfg) {
+                        if (node.NodeType == 1) {
+                            return cfg.collapseIcon;
+                        }
+                        return '';
+                    },
+                    expandIcon: 'glyphicon glyphicon-minus',
+                    collapseIcon: 'glyphicon glyphicon-plus',
+                },
+                data: '[{ "ID":1, "Name": "Root", "NodeType":1 }]',
+                onNodeExpanded: function(event, node) {
+                    //get data from server
+                    if (node.Nodes == null || node.Nodes.length == 0) {
+                        setTimeout(function() {
+                            for (var i = 0; i < 5; i++) {
+                                var nodeId = ++nodeCounter;
+                                var newNode = { ID: nodeId, Name: 'Node ' + nodeId, NodeType: nodeId % 2 };
+                                tree2.add(newNode, node);
+                            }
+                            tree2.expand(node);
+                        }, 2000);
+                    }
+                }
+            };
+
+            var tree2 = $("#treeToggle").treePanel(option2);
+            $('button[name="btnSelect2"]').click(function() {
+                tree2.select(4);
+            });
+            $('button[name="btnDisSelect2"]').click(function() {
+                tree2.disSelect();
+            });
+            $('button[name="btnExpand2"]').click(function() {
+                tree2.expand(5);
+            });
+            $('button[name="btnCollapse2"]').click(function() {
+                tree2.collapse({ ID: 5 });
+            });
+            $('button[name="btnRemove2"]').click(function() {
+                if (tree2.selectedNode) {
+                    tree2.remove(tree2.selectedNode);
+                }
+            });
+            $('button[name="btnUpdate2"]').click(function() {
+                if (tree2.selectedNode) {
+                    tree2.update({ ID: tree2.selectedNode.ID, Name: 'hi' });
+                }
+            });
+            $('button[name="btnAddTop2"]').click(function() {
+                tree2.add('{ "ID": 99999, "Name": "Top 3" }');
+                $(this).attr('disabled', true);
+            });
+            $('button[name="btnAddThird2"]').click(function() {
+                var third2 = {
+                    number: 302,
+                    name: 'Third 2',
+                    nodes: [
+                        { number: 401, name: 'Fourth 1' }
+                    ]
+                };
+                tree2.add(third2, '202', 0);
+                $(this).attr('disabled', true);
+            });
+            $('button[name="btnMove2"]').click(function() {
+                tree2.move('201', '101');
+                $(this).attr('disabled', true);
+            });
+            $('button[name="btnClean"]').click(function() {
+                if (tree2.selectedNode != null) {
+                    tree2.clean(tree2.selectedNode);
+                }
             });
         });
     </script>
