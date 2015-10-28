@@ -110,7 +110,10 @@ $.fn.treePanel = function(options) {
                     var toggleClass = toggleRender.call(me, parentNode, me._options.toggleIcon);
                     parentToggleIcon.addClass(toggleClass);
                 } else {
-                    parentToggleIcon.addClass(me._options.toggleIcon.collapseIcon);
+                    if (!parentToggleIcon.hasClass(me._options.toggleIcon.expandIcon) &&
+                        !parentToggleIcon.hasClass(me._options.toggleIcon.collapseIcon)) {
+                        parentToggleIcon.addClass(me._options.toggleIcon.collapseIcon)
+                    }
                 }
                 //rerender parent node icon
                 me._reRenderNodeIcon(parentNodeItem, parentNode);
@@ -519,6 +522,9 @@ $.fn.treePanel = function(options) {
                     }
                 }
             }
+
+            event.stopPropagation();
+            return false;
         },
 
         _triggerNodeSelectedEvent: function(nodeData) {
