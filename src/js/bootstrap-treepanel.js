@@ -522,6 +522,9 @@ $.fn.treePanel = function(options) {
                     }
                 }
             }
+
+            event.stopPropagation();
+            return false;
         },
 
         _triggerNodeSelectedEvent: function(nodeData) {
