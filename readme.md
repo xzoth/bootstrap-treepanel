@@ -1,4 +1,6 @@
 #Bootstrap Tree Panel
+
+[![Join the chat at https://gitter.im/xzoth/bootstrap-treepanel](https://badges.gitter.im/xzoth/bootstrap-treepanel.svg)](https://gitter.im/xzoth/bootstrap-treepanel?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A simple tree view plugin for Bootstrap
 
 [DEMO](http://xzoth.github.io/bootstrap-treepanel/ "DEMO")
